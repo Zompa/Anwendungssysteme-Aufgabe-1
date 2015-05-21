@@ -1,0 +1,71 @@
+package auctionService;
+
+import java.util.List;
+import java.util.logging.Logger;
+
+import util.SimpleParser;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+
+/**
+ * The purpose of this class is listening for auction creation request and
+ * creating auctions accordingly. It listens for requests via long polling. As
+ * soon as a request arrives it creates a new AuctionService. Simple.
+ * 
+ * @author Daniel
+ * 
+ */
+public class AuctionCreationService extends Thread {
+
+	public static final String AUCTION_CREATION_QUEUE_NAME = "Create_Auction_Queue";
+
+	private final static Logger LOGGER = Logger
+			.getLogger(AuctionCreationService.class.getName());
+	private final AmazonSQS sqs;
+
+	public AuctionCreationService(AmazonSQS sqs) {
+		this.sqs = sqs;
+
+		// init Queue
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest(
+				AUCTION_CREATION_QUEUE_NAME);
+		String myQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
+
+		LOGGER.info("Initialized");
+
+	}
+
+	@Override
+	public void run() {
+
+		ReceiveMessageRequest receiveRequest = new ReceiveMessageRequest()
+				.withQueueUrl(AUCTION_CREATION_QUEUE_NAME)
+				.withMaxNumberOfMessages(10).withWaitTimeSeconds(20);
+		LOGGER.info("Start Polling Loop");
+		while (!isInterrupted()) {
+			LOGGER.info("Long polling");
+			List<Message> messages = sqs.receiveMessage(receiveRequest)
+					.getMessages();
+			for (Message m : messages) {
+				createAuction(m);
+			}
+		}
+	}
+
+	private void createAuction(Message m) {
+
+		LOGGER.info("Create Auction");
+
+		String[] attributes = SimpleParser.getMessageAttributes(m);
+		if (attributes[0].equals("CREATE_AUCTION")) {
+			new AuctionService(sqs, attributes[1],
+					Integer.parseInt(attributes[2])).start();
+		} else {
+			LOGGER.info("WRONG MESSAGE: " + m.getBody());
+		}
+
+	}
+}

@@ -1,0 +1,143 @@
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.xspec.M;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+
+public class Consumer extends Thread {
+
+	private static String inputQueueURL;
+	final AmazonSQS sqs;
+
+	private static Map<String, Integer> numberOfCalls = new HashMap<>();
+
+	public Consumer(AmazonSQS sqs) {
+		super();
+		this.sqs = sqs;
+	}
+
+	public static void main(String[] args) {
+		// init
+		AWSCredentials credentials = null;
+		try {
+			credentials = new ProfileCredentialsProvider("default")
+					.getCredentials();
+		} catch (Exception e) {
+			throw new AmazonClientException(
+					"Cannot load the credentials from the credential profiles file. "
+							+ "Please make sure that your credentials file is at the correct "
+							+ "location (C:\\Users\\Daniel\\.aws\\credentials), and is in valid format.",
+					e);
+		}
+
+		AmazonSQS sqs = new AmazonSQSClient(credentials);
+		Region euCentral = Region.getRegion(Regions.EU_CENTRAL_1);
+		sqs.setRegion(euCentral);
+
+		// init test queue
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest(
+				"Ghostbusters");
+		inputQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+
+		//fill the queue with some testmessages
+		//sendTestMessages(sqs, 100);
+		System.out.println("Test messages sent");
+		//init consumer
+		Consumer consumer = new Consumer(sqs);
+		consumer.start();
+		
+		//interrupt the consumer after 3 seconds
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("KILL THE THREAD!!!");
+		consumer.interrupt();
+		
+		//print the results
+		consumer.report();
+	}
+
+	private static void sendTestMessages(AmazonSQS sqs, int amount) {
+		double random;
+		SendMessageRequest sendMessageRequest1 = new SendMessageRequest(inputQueueURL, "Who you gonna call?");
+		SendMessageRequest sendMessageRequest2 = new SendMessageRequest(inputQueueURL, "Who can you call?");
+		SendMessageRequest sendMessageRequest3 = new SendMessageRequest(inputQueueURL, "Ghostbusters!");
+		
+		for (int i=0; i<amount; i++) {
+			random = Math.random();
+			if (random> 0.7) {
+//				sendMessageRequest = new Sen
+//	            sqs.sendMessage(new SendMessageRequest(inputQueueURL, "Who you gonna call?"));
+				sqs.sendMessage(sendMessageRequest1);
+	            continue;
+			}
+			if (random > 0.5) {
+				sqs.sendMessage(sendMessageRequest2);
+	            continue;
+			}
+			sqs.sendMessage(sendMessageRequest3);
+		}
+		
+	}
+
+	@Override
+	public void run() {
+		while (!isInterrupted()) {
+			// schaue nach einer Anfrage
+
+			ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
+					inputQueueURL);
+			// receiveMessageRequest.s
+			List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
+					.getMessages();
+
+			System.out.println("polling...");
+			if (!messages.isEmpty()) {
+				System.out.println("...got messages!");
+				String body;
+				for (Message message : messages) {
+					body = message.getBody();
+					if (numberOfCalls.containsKey(body)) {
+
+						numberOfCalls.put(body, numberOfCalls.get(body) + 1);
+					}
+					else numberOfCalls.put(body, 1);
+					
+					//Done delete Message
+		            String messageRecieptHandle = messages.get(0).getReceiptHandle();
+		            sqs.deleteMessage(new DeleteMessageRequest(inputQueueURL, messageRecieptHandle));
+				}
+			}
+			else {
+				System.out.println("...no messages.");
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					interrupt();
+				}
+			}
+		}
+	}
+	public void report() {
+		System.out.println("---Report---");
+		for (Entry<String, Integer> e: numberOfCalls.entrySet()) {
+			System.out.println(e.toString());
+		}
+	}
+}

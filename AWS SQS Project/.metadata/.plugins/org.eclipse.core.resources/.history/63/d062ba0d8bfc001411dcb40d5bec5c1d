@@ -1,0 +1,79 @@
+import java.util.List;
+
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.xspec.M;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+
+
+public class TimeServiceThread extends Thread{
+
+	private static String inputQueueURL;
+	final AmazonSQS sqs;
+	
+	public TimeServiceThread(AmazonSQS sqs) {
+		super();
+		this.sqs = sqs;
+	}
+
+	public static void main(String[] args) {
+		//init
+        AWSCredentials credentials = null;
+        try {
+            credentials = new ProfileCredentialsProvider("default").getCredentials();
+        } catch (Exception e) {
+            throw new AmazonClientException(
+                    "Cannot load the credentials from the credential profiles file. " +
+                    "Please make sure that your credentials file is at the correct " +
+                    "location (C:\\Users\\Daniel\\.aws\\credentials), and is in valid format.",
+                    e);
+        }
+
+        AmazonSQS sqs = new AmazonSQSClient(credentials);
+        Region euCentral = Region.getRegion(Regions.EU_CENTRAL_1);
+        sqs.setRegion(euCentral);
+		
+        //init test queue
+        CreateQueueRequest createQueueRequest = new CreateQueueRequest("TimeServiceTestQueue");
+        inputQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+
+        
+        
+		LoggingQueue timeServiceThread = new LoggingQueue(sqs);
+		timeServiceThread.run();
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		timeServiceThread.interrupt();
+	}
+	
+	
+	@Override
+	public void run() {
+		while (!isInterrupted()) {
+			//schaue nach einer Anfrage
+
+            ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(inputQueueURL);
+            //receiveMessageRequest.s
+            List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
+            
+            if (!messages.isEmpty()) {
+            	for (Message message: messages) {
+            		//message.get
+            	}
+            }
+			//Wenn du eine hast antworte mit Uhrzeit
+			//Wenn nicht dann schalfe
+		}
+	}
+}

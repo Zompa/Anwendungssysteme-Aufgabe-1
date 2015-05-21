@@ -1,0 +1,10 @@
+package util;
+
+import com.amazonaws.services.sqs.model.Message;
+
+public class AbstractMessageParser {
+
+	public static String[] readMessage(Message message) {
+		
+	}
+}

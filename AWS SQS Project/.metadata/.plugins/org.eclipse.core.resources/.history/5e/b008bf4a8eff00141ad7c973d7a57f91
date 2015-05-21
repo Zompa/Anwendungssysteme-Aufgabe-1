@@ -1,0 +1,5 @@
+package auctionService;
+
+public class AuctionCreationService {
+
+}

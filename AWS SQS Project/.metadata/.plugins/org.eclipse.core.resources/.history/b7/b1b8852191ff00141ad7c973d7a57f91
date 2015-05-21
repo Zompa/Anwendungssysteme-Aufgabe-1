@@ -1,0 +1,9 @@
+package util;
+
+import com.amazonaws.services.sqs.model.Message;
+
+public abstract class  AbstractMessageParser< E extends TNEMessage>{
+
+	public abstract E getTNEMessage(Message message);
+	public abstract String getTNE
+}

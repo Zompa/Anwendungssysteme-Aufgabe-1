@@ -1,0 +1,331 @@
+!SESSION 2015-05-15 11:56:24.819 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-15 11:57:20.846
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-15 11:57:20.848
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2015-05-15 12:08:25.778 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:40.547
+!MESSAGE Starting the AWS toolkit core plugin...
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-15 12:08:40.872
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-15 12:08:40.873
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.897
+!MESSAGE Failed to load credential profiles from (C:\Users\Daniel\.aws\credentials).AWS credential profiles file not found in the given path: C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.935
+!MESSAGE Monitoring content of C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.938
+!MESSAGE AWS toolkit core plugin initialized after 3395 milliseconds.
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.942
+!MESSAGE Failed to load credential profiles from (C:\Users\Daniel\.aws\credentials).AWS credential profiles file not found in the given path: C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.944
+!MESSAGE No account is configued in the toolkit. Bootstrapping the credentials file at (C:\Users\Daniel\.aws\credentials).
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.946
+!MESSAGE Failed to load credential profiles from (C:\Users\Daniel\.aws\credentials).Unable to open the destination file.
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:08:43.946
+!MESSAGE No account could be found. Switching to a temporary account.
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:10:19.316
+!MESSAGE Switching to global default account
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:10:19.319
+!MESSAGE No profile found: default
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 12:10:19.544
+!MESSAGE The current accountId is not found in the system. Switching to the default account.
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-15 12:16:10.661
+!MESSAGE Downloading the SDK from CloudFront to location C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk4207720532712731500\sdk.zip
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-15 12:21:02.468
+!MESSAGE SDK download completes. Location: C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk4207720532712731500\sdk.zip, File-length: 104186624
+
+!ENTRY org.eclipse.ui 4 0 2015-05-15 14:19:49.996
+!MESSAGE Unhandled event loop exception
+!STACK 0
+org.eclipse.swt.SWTException: Failed to execute runnable (java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?))
+	at org.eclipse.swt.SWT.error(SWT.java:4397)
+	at org.eclipse.swt.SWT.error(SWT.java:4312)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:138)
+	at org.eclipse.swt.widgets.Display.runAsyncMessages(Display.java:4145)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3762)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$9.run(PartRenderingEngine.java:1113)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:332)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:997)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:140)
+	at org.eclipse.ui.internal.Workbench$5.run(Workbench.java:611)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:332)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:567)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:150)
+	at org.eclipse.ui.internal.ide.application.IDEApplication.start(IDEApplication.java:124)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:110)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:79)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:354)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:181)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:636)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:591)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1450)
+Caused by: java.lang.IllegalStateException: Need an underlying widget to be able to set the input.(Has the widget been disposed?)
+	at org.eclipse.jface.viewers.StructuredViewer.setInput(StructuredViewer.java:1681)
+	at com.amazonaws.eclipse.explorer.sqs.QueueEditor$LoadMessagesThread$1.run(QueueEditor.java:272)
+	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
+	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
+	... 23 more
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-15 15:00:05.142
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: User: arn:aws:iam::222522902332:user/AnwSysStudent is not authorized to perform: dynamodb:ListTables on resource: * (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: AccessDeniedException; Request ID: 1IIG1MD4JC3UUNIQQAC47ENHUNVV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:3106)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.listTables(AmazonDynamoDBClient.java:1259)
+	at com.amazonaws.eclipse.explorer.dynamodb.DynamoDBContentProvider$2.loadData(DynamoDBContentProvider.java:123)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 15:00:24.846
+!MESSAGE Switching to global default account
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-15 15:00:24.850
+!MESSAGE The current accountId is not found in the system. Switching to the default account.
+!SESSION 2015-05-17 13:33:40.806 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-17 13:33:59.815
+!MESSAGE Starting the AWS toolkit core plugin...
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-17 13:34:06.230
+!MESSAGE Monitoring content of C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-17 13:34:06.299
+!MESSAGE AWS toolkit core plugin initialized after 6487 milliseconds.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-17 13:34:15.878
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-17 13:34:15.879
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-17 17:03:14.074
+!MESSAGE Switching to global default account
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-17 17:04:40.801
+!MESSAGE Switching to global default account
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:05:23.985
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: Access to the resource https://sqs.eu-central-1.amazonaws.com/ is denied. (Service: AmazonSQS; Status Code: 403; Error Code: AccessDenied; Request ID: e7ef92ee-c5d5-5a49-af38-df3c75b91d66)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.sqs.AmazonSQSClient.invoke(AmazonSQSClient.java:2291)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1068)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1367)
+	at com.amazonaws.eclipse.explorer.sqs.SQSContentProvider$1.loadData(SQSContentProvider.java:74)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:05:29.949
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: Access to the resource https://sqs.eu-central-1.amazonaws.com/ is denied. (Service: AmazonSQS; Status Code: 403; Error Code: AccessDenied; Request ID: cb61c29a-c9fb-5fa6-9f3f-8f487989f22a)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.sqs.AmazonSQSClient.invoke(AmazonSQSClient.java:2291)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1068)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1367)
+	at com.amazonaws.eclipse.explorer.sqs.SQSContentProvider$1.loadData(SQSContentProvider.java:74)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:05:39.419
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.services.s3.model.AmazonS3Exception: Access Denied (Service: Amazon S3; Status Code: 403; Error Code: AccessDenied; Request ID: F95C2A1FD82B12E8), S3 Extended Request ID: 4Qt0FlzwVw8ubqQrMRAtSLyoyT2CSb7BYzqjlc/soEe3oYpgIuUALCgbdcjd4OU9qV730x1Bfj0=
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:3699)
+	at com.amazonaws.services.s3.AmazonS3Client.invoke(AmazonS3Client.java:3649)
+	at com.amazonaws.services.s3.AmazonS3Client.listBuckets(AmazonS3Client.java:674)
+	at com.amazonaws.services.s3.AmazonS3Client.listBuckets(AmazonS3Client.java:682)
+	at com.amazonaws.eclipse.explorer.s3.S3ContentProvider$2.loadData(S3ContentProvider.java:88)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:05:42.960
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: User: arn:aws:iam::987751657235:user/Gruppe-R is not authorized to perform: dynamodb:ListTables on resource: * (Service: AmazonDynamoDBv2; Status Code: 400; Error Code: AccessDeniedException; Request ID: J56FS0VRI8MH713TCTPG82MST3VV4KQNSO5AEMVJF66Q9ASUAAJG)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.invoke(AmazonDynamoDBClient.java:3106)
+	at com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient.listTables(AmazonDynamoDBClient.java:1259)
+	at com.amazonaws.eclipse.explorer.dynamodb.DynamoDBContentProvider$2.loadData(DynamoDBContentProvider.java:123)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.identitymanagement 2 0 2015-05-17 17:05:54.966
+!MESSAGE Unable to describe users
+!STACK 0
+com.amazonaws.AmazonServiceException: User: arn:aws:iam::987751657235:user/Gruppe-R is not authorized to perform: iam:ListUsers on resource: arn:aws:iam::987751657235:user/ (Service: AmazonIdentityManagement; Status Code: 403; Error Code: AccessDenied; Request ID: 32df8ec3-fca6-11e4-9690-319cfadc273f)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.invoke(AmazonIdentityManagementClient.java:4989)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.listUsers(AmazonIdentityManagementClient.java:1051)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.listUsers(AmazonIdentityManagementClient.java:4502)
+	at com.amazonaws.eclipse.identitymanagement.user.UserTable.listUsers(UserTable.java:197)
+	at com.amazonaws.eclipse.explorer.identitymanagement.AbstractUserTable$LoadUserTableThread.run(AbstractUserTable.java:155)
+
+!ENTRY com.amazonaws.eclipse.identitymanagement 2 0 2015-05-17 17:05:58.989
+!MESSAGE Unable to describe groups
+!STACK 0
+com.amazonaws.AmazonServiceException: User: arn:aws:iam::987751657235:user/Gruppe-R is not authorized to perform: iam:ListGroups on resource: arn:aws:iam::987751657235:group/ (Service: AmazonIdentityManagement; Status Code: 403; Error Code: AccessDenied; Request ID: 3568d1ea-fca6-11e4-a534-955dfd4e35c9)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.invoke(AmazonIdentityManagementClient.java:4989)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.listGroups(AmazonIdentityManagementClient.java:393)
+	at com.amazonaws.services.identitymanagement.AmazonIdentityManagementClient.listGroups(AmazonIdentityManagementClient.java:4425)
+	at com.amazonaws.eclipse.identitymanagement.group.GroupTable.listGroups(GroupTable.java:200)
+	at com.amazonaws.eclipse.explorer.identitymanagement.AbstractGroupTable$LoadGroupTableThread.run(AbstractGroupTable.java:155)
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:06:57.555
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: Access to the resource https://sqs.eu-central-1.amazonaws.com/ is denied. (Service: AmazonSQS; Status Code: 403; Error Code: AccessDenied; Request ID: 61b36a9f-18e4-50a2-9527-274da82ed732)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.sqs.AmazonSQSClient.invoke(AmazonSQSClient.java:2291)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1068)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1367)
+	at com.amazonaws.eclipse.explorer.sqs.SQSContentProvider$1.loadData(SQSContentProvider.java:74)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+
+!ENTRY com.amazonaws.eclipse.core 2 0 2015-05-17 17:06:58.315
+!MESSAGE Error loading explorer data
+!STACK 0
+com.amazonaws.AmazonServiceException: Access to the resource https://sqs.eu-central-1.amazonaws.com/ is denied. (Service: AmazonSQS; Status Code: 403; Error Code: AccessDenied; Request ID: a47b2501-2590-5e30-9540-68d3955a19a0)
+	at com.amazonaws.http.AmazonHttpClient.handleErrorResponse(AmazonHttpClient.java:1077)
+	at com.amazonaws.http.AmazonHttpClient.executeOneRequest(AmazonHttpClient.java:725)
+	at com.amazonaws.http.AmazonHttpClient.executeHelper(AmazonHttpClient.java:460)
+	at com.amazonaws.http.AmazonHttpClient.execute(AmazonHttpClient.java:295)
+	at com.amazonaws.services.sqs.AmazonSQSClient.invoke(AmazonSQSClient.java:2291)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1068)
+	at com.amazonaws.services.sqs.AmazonSQSClient.listQueues(AmazonSQSClient.java:1367)
+	at com.amazonaws.eclipse.explorer.sqs.SQSContentProvider$1.loadData(SQSContentProvider.java:74)
+	at com.amazonaws.eclipse.explorer.AbstractContentProvider$DataLoaderThread.run(AbstractContentProvider.java:131)
+!SESSION 2015-05-21 09:40:19.371 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 09:41:28.896
+!MESSAGE Starting the AWS toolkit core plugin...
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 09:41:36.226
+!MESSAGE Monitoring content of C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 09:41:36.339
+!MESSAGE AWS toolkit core plugin initialized after 7449 milliseconds.
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-21 09:41:36.937
+!MESSAGE Downloading the SDK from CloudFront to location C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk4404864145155674105\sdk.zip
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-21 09:41:48.810
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-21 09:41:48.811
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-21 09:48:01.534
+!MESSAGE SDK download completes. Location: C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk4404864145155674105\sdk.zip, File-length: 104622885
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 10:02:34.028
+!MESSAGE Switching to global default account
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 10:02:39.196
+!MESSAGE Switching to global default account

@@ -1,0 +1,23 @@
+package auctionService;
+
+import java.util.logging.Logger;
+
+public class AuctionCreationService extends Thread{
+
+	public static final String AUCTION_CREATION_QUEUE_NAME = "Create Auction Queue";
+
+	private final static Logger LOGGER = Logger.getLogger(AuctionCreationService.class.getName()); 
+	
+	public AuctionCreationService(AmazonSQS sqs) {
+		
+	}
+	
+	
+	@Override
+	public void run() {
+		while (!isInterrupted()) {
+			//Langabfrag
+			LOGGER.info("Test");
+		}
+	}
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="TimeServiceThread"/>
+<fullyQualifiedTypeName name="com.amazonaws.services.dynamodbv2.xspec.M"/>
+<fullyQualifiedTypeName name="com.amazonaws.services.sqs.model.Message"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="java.util.Map"/>
+<fullyQualifiedTypeName name="java.util.Map.Entry"/>
+<fullyQualifiedTypeName name="com.amazonaws.services.sqs.AmazonSQS"/>
+<fullyQualifiedTypeName name="com.amazonaws.services.sqs.model.SendMessageRequest"/>
+</qualifiedTypeNameHistroy>

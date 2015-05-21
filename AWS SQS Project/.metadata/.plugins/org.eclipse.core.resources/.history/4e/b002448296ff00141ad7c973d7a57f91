@@ -1,0 +1,84 @@
+package auctionService;
+
+import java.util.List;
+import java.util.logging.Logger;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+
+public class AuctionService extends Thread{
+	
+	private final static String QUEUE_NAME_PREFIX = "AuctionQueue_";
+	private final static Logger LOGGER = Logger.getLogger(AuctionService.class.getName()); 
+	private final AmazonSQS sqs;
+	private final String name;
+	private final int auctionTime;
+
+	private final String receiveQueueURL;
+	private final String sendQueueURL;
+
+	private final ReceiveMessageRequest receiveRequest;
+	//For now
+	private final int auctionID = 666;
+	
+	private double highestBid = 0.0d;
+	private String highestBidder = "Chuck Norris";
+	
+	private long endTimeMillis;
+	
+	public AuctionService(AmazonSQS sqs, String name, int auctionTime) {
+		super();
+		this.sqs = sqs;
+		this.name = name;
+		this.auctionTime = auctionTime;
+		
+		//init queues
+        CreateQueueRequest createQueueRequest = new CreateQueueRequest(QUEUE_NAME_PREFIX+auctionID);
+        receiveQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+        //TODO change
+        createQueueRequest = new CreateQueueRequest("AUCTION_BROADCAST_QUEUE");
+        sendQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+		
+        receiveRequest = new ReceiveMessageRequest(receiveQueueURL).setMaxNumberOfMessages(10);
+	}
+	
+	@Override
+	public void run() {
+		//setting end time
+		endTimeMillis = System.currentTimeMillis() + auctionTime * 1000;
+		broadcastAuctionStart();
+		while (!isInterrupted() && System.currentTimeMillis() < endTimeMillis) {
+			processBids(pollBids());
+			
+			Thread.sleep(100);
+		}
+		broadcastAuctionResults();
+	}
+	
+	public List<Message> pollBids() {
+
+		List<Message> messages = sqs.receiveMessage(receiveRequest).getMessages();
+	}
+	
+	public void broadcastAuctionStart() {
+		String messageText = "AUCTION_STARTED/"+auctionID+"/"+auctionTime+"/"+name;
+		broadcast(messageText);
+	}
+	
+	public void broadcastAuctionResults() {
+		String messageText = "AUCTION_END/"+auctionID+"/"+highestBidder+"/"+highestBid;
+		broadcast(messageText);
+	}
+
+	private void broadcast(String messageText) {
+
+		LOGGER.info(messageText);
+        sqs.sendMessage(new SendMessageRequest(sendQueueURL, messageText));
+		
+	}
+	
+
+}

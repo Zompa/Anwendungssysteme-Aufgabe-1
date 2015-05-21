@@ -1,0 +1,45 @@
+package auctionService;
+
+import java.util.logging.Logger;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+
+public class AuctionService extends Thread{
+	
+	private 
+	private final static Logger LOGGER = Logger.getLogger(AuctionService.class.getName()); 
+	private final AmazonSQS sqs;
+	private final String name;
+	private final int auctionTime;
+	
+	//For now
+	private final int auctionID = 666;
+	
+	private double highestBid = 0.0d;
+	private String highestBidder = "Chuck Norris";
+	
+	private long endTimeMillis;
+	
+	public AuctionService(AmazonSQS sqs, String name, int auctionTime) {
+		super();
+		this.sqs = sqs;
+		this.name = name;
+		this.auctionTime = auctionTime;
+	}
+	
+	@Override
+	public void run() {
+		//setting end time
+		endTimeMillis = System.currentTimeMillis() + auctionTime * 1000;
+		broadcastAuctionStart();
+		while (!isInterrupted() && System.currentTimeMillis() < endTimeMillis) {
+			processBids(pollBids());
+			
+			Thread.sleep(100);
+		}
+		broadcastAuctionResults();
+	}
+	
+	
+
+}

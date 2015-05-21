@@ -1,0 +1,19 @@
+package auctionService;
+
+import java.util.logging.Logger;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+
+public class AuctionService extends Thread{
+	
+
+	private final static Logger LOGGER = Logger.getLogger(AuctionService.class.getName()); 
+	private final AmazonSQS sqs;
+	
+	public AuctionService(AmazonSQS sqs) {
+		super();
+		this.sqs = sqs;
+	}
+	
+
+}

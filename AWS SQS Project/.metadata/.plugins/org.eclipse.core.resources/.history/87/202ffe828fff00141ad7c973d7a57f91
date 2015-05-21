@@ -1,0 +1,44 @@
+package auctionService;
+
+import java.util.List;
+import java.util.logging.Logger;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+
+public class AuctionCreationService extends Thread{
+
+	public static final String AUCTION_CREATION_QUEUE_NAME = "Create Auction Queue";
+
+	private final static Logger LOGGER = Logger.getLogger(AuctionCreationService.class.getName()); 
+	private final AmazonSQS sqs;
+	
+	
+	public AuctionCreationService(AmazonSQS sqs) {
+		this.sqs = sqs;
+		
+		//init Queue
+        CreateQueueRequest createQueueRequest = new CreateQueueRequest(AUCTION_CREATION_QUEUE_NAME);
+        String myQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
+        
+
+		LOGGER.info("Initialized");
+        
+	}
+	
+	
+	@Override
+	public void run() {
+		
+		ReceiveMessageRequest receiveRequest = new ReceiveMessageRequest().withQueueUrl(AUCTION_CREATION_QUEUE_NAME).withMaxNumberOfMessages(10).withWaitTimeSeconds(20);
+		while (!isInterrupted()) {
+			LOGGER.info("Long polling");
+			List<Message> messages = sqs.receiveMessage(receiveRequest).getMessages();
+			for (Message m: messages) {
+				LOGGER.info("Found Message");
+			}
+		}
+	}
+}

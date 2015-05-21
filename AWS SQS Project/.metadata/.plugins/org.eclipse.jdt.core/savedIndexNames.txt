@@ -1,0 +1,3 @@
+INDEX VERSION 1.126+C:\Users\Daniel\Documents\Meine Dokumente\Uni\Anwendungssysteme\AWS SQS Project\.metadata\.plugins\org.eclipse.jdt.core
+1637808581.index
+3886605065.index

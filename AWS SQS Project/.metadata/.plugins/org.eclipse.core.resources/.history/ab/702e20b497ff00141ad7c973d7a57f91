@@ -1,0 +1,118 @@
+package auctionService;
+
+import java.util.List;
+import java.util.logging.Logger;
+
+import util.SimpleParser;
+
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+
+public class AuctionService extends Thread{
+	
+	private final static String QUEUE_NAME_PREFIX = "Auction_Queue_";
+	private final static Logger LOGGER = Logger.getLogger(AuctionService.class.getName()); 
+	private final AmazonSQS sqs;
+	private final String name;
+	private final int auctionTime;
+
+	private final String receiveQueueURL;
+	private final String sendQueueURL;
+
+	private final ReceiveMessageRequest receiveRequest;
+	//For now
+	private final int auctionID = 666;
+	
+	private double highestBid = 0.0d;
+	private String highestBidder = "Chuck Norris";
+	
+	private long endTimeMillis;
+	
+	public AuctionService(AmazonSQS sqs, String name, int auctionTime) {
+		super();
+		this.sqs = sqs;
+		this.name = name;
+		this.auctionTime = auctionTime;
+		
+		//init queues
+        CreateQueueRequest createQueueRequest = new CreateQueueRequest(QUEUE_NAME_PREFIX+auctionID);
+        receiveQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+        //TODO change
+        createQueueRequest = new CreateQueueRequest("AUCTION_BROADCAST_QUEUE");
+        sendQueueURL = sqs.createQueue(createQueueRequest).getQueueUrl();
+		
+        receiveRequest = new ReceiveMessageRequest(receiveQueueURL).withWaitTimeSeconds(10);
+	}
+	
+	@Override
+	public void run() {
+		//setting end time
+		endTimeMillis = System.currentTimeMillis() + auctionTime * 1000;
+		broadcastAuctionStart();
+		while (!isInterrupted() && System.currentTimeMillis() < endTimeMillis) {
+			processBids(sqs.receiveMessage(receiveRequest).getMessages());
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		broadcastAuctionResults();
+	}
+	
+	private void processBids(List<Message> messages) {
+		String[] messageAttributes;
+		String bidder;
+		double bid;
+		
+		for (Message message: messages) {
+			try {
+				messageAttributes = SimpleParser.getMessageAttributes(message);
+				
+				bid = Double.parseDouble(messageAttributes[1]);
+				bidder = messageAttributes[2];
+				
+				if (bid > highestBid) {
+					highestBid = bid;
+					highestBidder = bidder;
+					broadcastBidChange();
+				}
+			}
+			catch (Exception e) {
+				LOGGER.info("Processing failed: "+message.getBody());
+				e.printStackTrace();
+			}
+
+		}
+		
+	}
+
+	private void broadcastBidChange() {
+		String messageText = "NEW_HIGHEST_BIDDER/"+highestBid+"/"+highestBidder;
+		broadcast(messageText);
+	}
+
+	public void broadcastAuctionStart() {
+		String messageText = "AUCTION_STARTED/"+auctionID+"/"+auctionTime+"/"+name;
+		broadcast(messageText);
+	}
+	
+	public void broadcastAuctionResults() {
+		String messageText = "AUCTION_END/"+auctionID+"/"+highestBidder+"/"+highestBid;
+		broadcast(messageText);
+	}
+
+	private void broadcast(String messageText) {
+
+		LOGGER.info(messageText);
+        sqs.sendMessage(new SendMessageRequest(sendQueueURL, messageText));
+		
+	}
+	
+
+}
