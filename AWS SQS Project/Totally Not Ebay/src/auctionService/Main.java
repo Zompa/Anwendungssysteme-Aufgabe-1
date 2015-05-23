@@ -31,6 +31,9 @@ public class Main {
         
         AuctionCreationService auctionCreationService = new AuctionCreationService(sqs);
         auctionCreationService.start();
+        
+        Router router = new Router(sqs);
+		router.start();
 
 
 	}
