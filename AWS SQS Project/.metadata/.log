@@ -329,3 +329,71 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 10:02:39.196
 !MESSAGE Switching to global default account
+!SESSION 2015-05-21 17:20:04.232 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 17:20:13.738
+!MESSAGE Starting the AWS toolkit core plugin...
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 17:20:15.726
+!MESSAGE Monitoring content of C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-21 17:20:15.764
+!MESSAGE AWS toolkit core plugin initialized after 2032 milliseconds.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-21 17:20:21.349
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-21 17:20:21.350
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+!SESSION 2015-05-24 11:16:50.719 -----------------------------------------------
+eclipse.buildId=4.3.2.M20140221-1700
+java.version=1.8.0_45
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=de_DE
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-24 11:43:20.965
+!MESSAGE Starting the AWS toolkit core plugin...
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-24 11:43:28.055
+!MESSAGE Monitoring content of C:\Users\Daniel\.aws\credentials
+
+!ENTRY com.amazonaws.eclipse.core 1 0 2015-05-24 11:43:28.112
+!MESSAGE AWS toolkit core plugin initialized after 7151 milliseconds.
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-24 11:43:29.084
+!MESSAGE Downloading the SDK from CloudFront to location C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk5731771012702896799\sdk.zip
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-24 11:43:41.911
+!MESSAGE Warning: EGit couldn't detect the installation path "gitPrefix" of native Git. Hence EGit can't respect system level
+Git settings which might be configured in ${gitPrefix}/etc/gitconfig under the native Git installation directory.
+The most important of these settings is core.autocrlf. Git for Windows by default sets this parameter to true in
+this system level configuration. The Git installation location can be configured on the
+Team > Git > Configuration preference page's 'System Settings' tab.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.egit.ui 2 0 2015-05-24 11:43:41.941
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\Daniel'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.amazonaws.eclipse.sdk.ui 1 0 2015-05-24 11:50:37.249
+!MESSAGE SDK download completes. Location: C:\Users\Daniel\AppData\Local\Temp\aws-java-sdk5731771012702896799\sdk.zip, File-length: 104750510

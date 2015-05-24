@@ -112,8 +112,8 @@ public class AuctionService extends Thread {
 			try {
 				messageAttributes = SimpleParser.getMessageAttributes(message);
 
-				bid = Double.parseDouble(messageAttributes[1]);
-				bidder = messageAttributes[2];
+				bid = Double.parseDouble(messageAttributes[2]);
+				bidder = messageAttributes[3];
 
 				if (bid > highestBid) {
 					highestBid = bid;

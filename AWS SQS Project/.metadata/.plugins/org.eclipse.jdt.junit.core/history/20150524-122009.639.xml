@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><testrun name="AuctionTests" project="Totally Not Ebay" tests="1" started="1" failures="0" errors="0" ignored="0">
+  <testsuite name="test.auctionService.AuctionTests" incomplete="true">
+    <testcase name="simpleAuctionTest" classname="test.auctionService.AuctionTests" incomplete="true"/>
+  </testsuite>
+</testrun>

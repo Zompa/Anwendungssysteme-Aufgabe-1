@@ -1,0 +1,131 @@
+package test.auctionService;
+
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
+import auctionService.AuctionCreationService;
+
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.CreateQueueRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+
+public class AuctionTests {
+	/**
+	 * This test does not work and it cant work, because you cant expect to get
+	 * all broadcast messages from a queue with one poll
+	 */
+	@Test
+	public void simpleAuctionTest() {
+		System.out.println("Test: init");
+		AWSCredentials credentials = null;
+		try {
+			credentials = new ProfileCredentialsProvider("default")
+					.getCredentials();
+		} catch (Exception e) {
+			throw new AmazonClientException(
+					"Cannot load the credentials from the credential profiles file. "
+							+ "Please make sure that your credentials file is at the correct "
+							+ "location (C:\\Users\\Daniel\\.aws\\credentials), and is in valid format.",
+					e);
+		}
+
+		AmazonSQS sqs = new AmazonSQSClient(credentials);
+		sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+
+		AuctionCreationService auctionCreationService = new AuctionCreationService(
+				sqs);
+		auctionCreationService.start();
+		System.out.println("Create Auction");
+		String messageBody = "CREATE_AUCTION/KARTOFFEL/10";
+		SendMessageRequest sendMessageRequest = new SendMessageRequest(
+				"Create_Auction_Queue", messageBody);
+		sqs.sendMessage(sendMessageRequest);
+
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest(
+				"Auction_Queue_666");
+		sqs.createQueue(createQueueRequest).getQueueUrl();
+
+		System.out.println("Send Test Messages");
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/10/Alice");
+		sqs.sendMessage(sendMessageRequest);
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/10/Bob");
+		sqs.sendMessage(sendMessageRequest);
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/20/Bob");
+		sqs.sendMessage(sendMessageRequest);
+
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/40/Alice");
+		sqs.sendMessage(sendMessageRequest);
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/50/Bob");
+		sqs.sendMessage(sendMessageRequest);
+
+		System.out.println("sleep 5 seconds");
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("send messages");
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/1000/Alice");
+		sqs.sendMessage(sendMessageRequest);
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/1100/Bob");
+		sqs.sendMessage(sendMessageRequest);
+		sendMessageRequest = new SendMessageRequest("Auction_Queue_666",
+				"MAKE_BID/666/1101/Eve");
+		sqs.sendMessage(sendMessageRequest);
+
+		System.out.println("sleep 10 seconds");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("polling messages");
+		ReceiveMessageRequest receiveRequest = new ReceiveMessageRequest()
+				.withQueueUrl("AUCTION_BROADCAST_QUEUE")
+				.withMaxNumberOfMessages(10);
+		List<Message> messages = new ArrayList<>();
+		for (int i=0; i<20; i++) {
+			messages.addAll(sqs.receiveMessage(receiveRequest)
+					.getMessages());
+			
+		}
+			
+		List<String> bodies = new ArrayList<>();
+		for (Message m : messages) {
+			bodies.add(m.getBody());
+			System.out.println(m.getBody());
+
+            String messageRecieptHandle = m.getReceiptHandle();
+            sqs.deleteMessage(new DeleteMessageRequest("AUCTION_BROADCAST_QUEUE", messageRecieptHandle));
+		}
+		//You cant assert that as messages will arrive in an uncertain order
+		//assertEquals("must have send 9 messages", 9, messages.size());
+		assertTrue("Must have sent initial message",
+				bodies.contains("AUCTION_STARTED/666/10/KARTOFFEL"));
+
+		assertTrue("Must have sent final message",
+				bodies.contains("AUCTION_END/666/Eve/1101"));
+	}
+}

@@ -1,0 +1,57 @@
+package test.auctionService;
+
+import auctionService.AuctionCreationService;
+
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+
+public class AuctionTests {
+
+	public void simpleAuctionTest() {
+        AWSCredentials credentials = null;
+        try {
+            credentials = new ProfileCredentialsProvider("default").getCredentials();
+        } catch (Exception e) {
+            throw new AmazonClientException(
+                    "Cannot load the credentials from the credential profiles file. " +
+                    "Please make sure that your credentials file is at the correct " +
+                    "location (C:\\Users\\Daniel\\.aws\\credentials), and is in valid format.",
+                    e);
+        }
+
+        AmazonSQS sqs = new AmazonSQSClient(credentials);
+        sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+        
+        AuctionCreationService auctionCreationService = new AuctionCreationService(sqs);
+        auctionCreationService.start();
+        String messageBody = "CREATE_AUCTION/KARTOFFEL/30";
+        SendMessageRequest sendMessageRequest = new SendMessageRequest("Create_Auction_Queue", messageBody);
+        sqs.sendMessage(sendMessageRequest);
+        
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/10/Alice");
+        sqs.sendMessage(sendMessageRequest);
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/10/Bob");
+        sqs.sendMessage(sendMessageRequest);
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/20/Bob");
+        sqs.sendMessage(sendMessageRequest);
+        
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/40/Alice");
+        sqs.sendMessage(sendMessageRequest);
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/50/Bob");
+        sqs.sendMessage(sendMessageRequest);
+        
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/1000/Alice");
+        sqs.sendMessage(sendMessageRequest);
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/1100/Bob");
+        sqs.sendMessage(sendMessageRequest);
+        sendMessageRequest = new SendMessageRequest("Auction_Queue_666", "MAKE_BID/666/1101/Eve");
+        sqs.sendMessage(sendMessageRequest);
+        
+	}
+}
