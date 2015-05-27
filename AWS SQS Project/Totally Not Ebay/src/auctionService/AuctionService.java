@@ -35,7 +35,7 @@ public class AuctionService extends Thread {
 	/**
 	 * set on initialization
 	 */
-	private final String sendQueueURL;
+	/*private final*/ public static String sendQueueURL; //TODO
 
 	/**
 	 * set on initialization. will be reused
@@ -156,6 +156,10 @@ public class AuctionService extends Thread {
 		LOGGER.info(messageText);
 		sqs.sendMessage(new SendMessageRequest(sendQueueURL, messageText));
 
+	}
+	
+	public static String getSendQueueURL() {
+		return sendQueueURL;
 	}
 
 }

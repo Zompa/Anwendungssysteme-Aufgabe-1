@@ -2,6 +2,7 @@ package auctionService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -25,7 +26,7 @@ public class Router extends Thread {
 	public static final String ROUTER_QUEUE_NAME = "Bid_Queue";
 	private final static Logger LOGGER = Logger.getLogger(Router.class.getName());
 	private final AmazonSQS sqs;
-	private String bidQueueURL;
+	public static String bidQueueURL;
 
 	/** contains auctionIDs of all registered auctions
 	 * 
@@ -62,26 +63,31 @@ public class Router extends Thread {
 	 * 
 	 */
 	public void receiveMessagesfromAuctionManager() {
-		//TODO change to URL as defined in AuctionService line 72 called 'sendQueueURL'
-		String queueURLfromAuctionManagerToRouter = "AUCTION_BROADCAST_QUEUE";
-		LOGGER.info("Receiving messages from AuctionManager.\n");
+		String queueURLfromAuctionManagerToRouter = AuctionService.getSendQueueURL();
+		//LOGGER.info("Receiving messages from AuctionManager.\n");
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(queueURLfromAuctionManagerToRouter);
 		List<Message> receivedChangesfromAuctionManager = sqs.receiveMessage(receiveMessageRequest).getMessages();
 
 		for(Message receivedChangeMessage : receivedChangesfromAuctionManager) {
 			try {
 				String[] receivedChangeMessageString = SimpleParser.getMessageAttributes(receivedChangeMessage);
-				if(receivedChangeMessageString[0].equals("AUCTION_STARTED")) 
+				if(receivedChangeMessageString[0].equals("AUCTION_STARTED")) {
 					auctionIDSet.add(Integer.parseInt(receivedChangeMessageString[1]));
-				else if(receivedChangeMessageString[0].equals("AUCTION_END"))
+					LOGGER.info("Registered new auction");
+				}	
+				else if(receivedChangeMessageString[0].equals("AUCTION_END")) {
 					auctionIDSet.remove(Integer.parseInt(receivedChangeMessageString[1]));
+					LOGGER.info("Deleted auction");
+				} else LOGGER.info("No auctions updated");
+					
 			} catch (Exception e) {
 				LOGGER.info("An error occurred while updating the Auction_ID storage");
 				e.printStackTrace();
 			} finally {
-				//delete message from ???name??? queue
+				//delete message from queue
 				String receiptHandle = receivedChangeMessage.getReceiptHandle();
 				sqs.deleteMessage(new DeleteMessageRequest(queueURLfromAuctionManagerToRouter, receiptHandle));
+				//LOGGER.info("Deleted Message from queue");
 			}
 		}
 	}
@@ -91,7 +97,7 @@ public class Router extends Thread {
 	 * @return a list containing valid and registered auctionIDs extracted from client messages
 	 */
 	public List<Message> receiveMessagesfromClient() {
-		LOGGER.info("Receiving messages from clients.\n");
+		//LOGGER.info("Receiving messages from clients.\n");
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(bidQueueURL);
 		List<Message> receivedClientMessages = sqs.receiveMessage(receiveMessageRequest).getMessages();
 
@@ -99,9 +105,10 @@ public class Router extends Thread {
 			try {
 				String[] messageAttributes = SimpleParser.getMessageAttributes(clientMessage);
 				//check if sent message contains an auctionID already contained in auctionIDSet
-				if(	messageAttributes[0].equals("MAKE_BID")
+				//System.out.println(Integer.parseInt(messageAttributes[1]));		
+				if(messageAttributes[0].equals("MAKE_BID")
 					&& isInteger(messageAttributes[1]) 
-					&& auctionIDSet.contains(messageAttributes[1])
+					&& auctionIDSet.contains(Integer.parseInt(messageAttributes[1]))
 				) destinationBidList.add(clientMessage); 
 				else LOGGER.info("This client message does not include a valid auctionID");
 			} catch (Exception e) {
@@ -121,20 +128,22 @@ public class Router extends Thread {
 	 * @param destinationBidList bid list from clients, filled in {@link #receiveMessagesfromClient() receiveMessagefromClient()}
 	 */
 	public void sendBidsToAuctionManager(List<Message> destinationBidList) {
-		LOGGER.info("Sending messages to AuctionManager.\n");
-		while(!destinationBidList.isEmpty()){
-			for(Message clientMessage : destinationBidList) {
-				String[] messageAttributes = SimpleParser.getMessageAttributes(clientMessage);
-				String queueURLfromRouterToAuctionManager = "Auction_Queue_" + messageAttributes[1];
-				try {
-					sqs.sendMessage(new SendMessageRequest(queueURLfromRouterToAuctionManager, clientMessage.toString()));
-				} catch (Exception e) {
-					LOGGER.info("An error occurred while sending client messages to AuctionManager");
-					e.printStackTrace();
-				} finally {
-					//delete bid from list
-					destinationBidList.remove(clientMessage);
-				}	
+		//LOGGER.info("Sending messages to AuctionManager.\n");
+		Iterator<Message> listIterator = destinationBidList.iterator();
+		while(listIterator.hasNext()) {
+			Message nextMessage = listIterator.next();
+			String[] messageAttributes = SimpleParser.getMessageAttributes(nextMessage);
+			String queueURLfromRouterToAuctionManager = "Auction_Queue_" + messageAttributes[1];
+			try {
+				sqs.sendMessage(new SendMessageRequest(queueURLfromRouterToAuctionManager, nextMessage.getBody()));
+				//delete bid from list
+				//destinationBidList.remove(nextMessage); //not such a clever way
+				listIterator.remove(); //remove the last element returned by iterator to avoid ConcurrentModificationException at next()
+			} catch (Exception e) {
+				LOGGER.info("An error occurred while sending client messages to AuctionManager");
+				e.printStackTrace();
+			} finally {
+				
 			}
 		}
 	}
@@ -154,6 +163,10 @@ public class Router extends Thread {
 			return false;
 		}
 		return true;
+	}
+	
+	public static String getBidQueueURL() {
+		return bidQueueURL;
 	}
 
 }
