@@ -1,5 +1,8 @@
 package auctionService;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -24,18 +27,19 @@ public class AuctionService extends Thread {
 	private final static String QUEUE_NAME_PREFIX = "Auction_Queue_";
 	private final static Logger LOGGER = Logger.getLogger(AuctionService.class
 			.getName());
+	private static final int AUCTION_START_OFFSET = 5;
 	private final AmazonSQS sqs;
 	private final String name;
 	private final int auctionTime;
 
 	/**
-	 * set on initialization. 
+	 * set on initialization.
 	 */
 	private final String receiveQueueURL;
 	/**
 	 * set on initialization
 	 */
-	/*private final*/ public static String sendQueueURL; //TODO
+	private final String sendQueueURL; // TODO
 
 	/**
 	 * set on initialization. will be reused
@@ -47,15 +51,17 @@ public class AuctionService extends Thread {
 	private double highestBid = 0.0d;
 	private String highestBidder = "Chuck Norris";
 
-	/**
-	 * As soon as currentTimeMillis() is larger than this value the Auction terminates
-	 */
-	private long endTimeMillis;
+	private String receiveQueueURLAbsolute = QUEUE_NAME_PREFIX + auctionID;
+
+	private Date startDate;
+	private Date endDate;
 
 	/**
 	 * @param sqs
-	 * @param name Name of the Auction
-	 * @param auctionTime Time of the Auction in seconds
+	 * @param name
+	 *            Name of the Auction
+	 * @param auctionTime
+	 *            Time of the Auction in seconds
 	 */
 	public AuctionService(AmazonSQS sqs, String name, int auctionTime) {
 		super();
@@ -75,30 +81,80 @@ public class AuctionService extends Thread {
 				.withWaitTimeSeconds(10);
 
 		LOGGER.info("Auction initialized: " + auctionID);
+
+		registerAuctionAtRouter(false);
+	}
+
+	/**
+	 * Registers the auction on the routers to allow the transmitting of
+	 * messages
+	 */
+	private void registerAuctionAtRouter(boolean destruction) {
+
+		List<String> routerQueueURLs = getRouterQueueURLs(sqs);
+
+		String message = destruction ? "AUCTION_DESTRUCTION/"
+				: "AUCTION_CREATION/";
+		message += auctionID + "/" + receiveQueueURLAbsolute;
+		for (String url : routerQueueURLs) {
+
+			sqs.sendMessage(new SendMessageRequest(url, message));
+		}
+		LOGGER.info("Registered Auction Creation/Destruction");
+	}
+
+	/**
+	 * This method is a placeholder. It would normally ask AWS for all existing
+	 * Queues and sorts out all queues that start with "ROUTER_REGISTRY_QUEUE_".
+	 * As we only have one router in this example, the method is not implemented
+	 * 
+	 * it only returns "ROUTER_REGISTRY_QUEUE_EXAMPLE"
+	 * 
+	 * @param sqs
+	 * @return
+	 */
+	private static List<String> getRouterQueueURLs(AmazonSQS sqs) {
+		List<String> result = new ArrayList<>();
+		result.add("ROUTER_REGISTRY_QUEUE_EXAMPLE");
+		return result;
 	}
 
 	@Override
 	public void run() {
 		// setting end time
-		endTimeMillis = System.currentTimeMillis() + auctionTime * 1000;
+		Calendar calendar = Calendar.getInstance(); // auctionTime
+		calendar.add(Calendar.SECOND, AUCTION_START_OFFSET);
+		startDate = calendar.getTime();
+		calendar.add(Calendar.SECOND, auctionTime);
+		endDate = calendar.getTime();
+		broadcastAuctionScheduled();
+		try {
+			Thread.sleep(AUCTION_START_OFFSET * 1000);
+		} catch (InterruptedException e1) {
+			interrupt();
+		}
 		broadcastAuctionStart();
-		//main loop: endTimeMillis is the end time of the auction
-		while (!isInterrupted() && System.currentTimeMillis() < endTimeMillis) {
-			//check for new bids and process them
+		// main loop: endTimeMillis is the end time of the auction
+		while (!isInterrupted() && Calendar.getInstance().before(endDate)) {
+			// check for new bids and process them
 			processBids(sqs.receiveMessage(receiveRequest).getMessages());
 
-			//I cant use long polling or the thread might not close the auction in time
+			// I cant use long polling or the thread might not close the auction
+			// in time
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				interrupt();
 			}
 		}
+		registerAuctionAtRouter(true);
 		broadcastAuctionResults();
 	}
 
+
 	/**
 	 * checks if a bid is valid and sets a new highest Bidder if necessary.
+	 * 
 	 * @param messages
 	 */
 	private void processBids(List<Message> messages) {
@@ -108,7 +164,8 @@ public class AuctionService extends Thread {
 
 		LOGGER.info("Processing new biddings");
 		for (Message message : messages) {
-			//Try catch to prevent whole thread from shutting down in case of malicious bid
+			// Try catch to prevent whole thread from shutting down in case of
+			// malicious bid
 			try {
 				messageAttributes = SimpleParser.getMessageAttributes(message);
 
@@ -124,23 +181,31 @@ public class AuctionService extends Thread {
 				LOGGER.info("Processing failed: " + message.getBody());
 				e.printStackTrace();
 			} finally {
-				//delete message
-	            String messageRecieptHandle = message.getReceiptHandle();
-	            sqs.deleteMessage(new DeleteMessageRequest(receiveQueueURL, messageRecieptHandle));
+				// delete message
+				String messageRecieptHandle = message.getReceiptHandle();
+				sqs.deleteMessage(new DeleteMessageRequest(receiveQueueURL,
+						messageRecieptHandle));
 			}
 
 		}
 
 	}
 
+
 	private void broadcastBidChange() {
 		String messageText = "NEW_HIGHEST_BIDDER/" + auctionID + "/"
 				+ highestBid + "/" + highestBidder;
 		broadcast(messageText);
 	}
-
+	
+	private void broadcastAuctionScheduled() {
+		String messageText = "AUCTION_SCHEDULED/" + auctionID + "/" + startDate.getTime() + "/" + endDate.getTime()
+				+ "/" + name;
+		broadcast(messageText);
+	}
+	
 	public void broadcastAuctionStart() {
-		String messageText = "AUCTION_STARTED/" + auctionID + "/" + auctionTime
+		String messageText = "AUCTION_STARTED/" + auctionID + "/" + endDate.getTime()
 				+ "/" + name;
 		broadcast(messageText);
 	}
@@ -156,10 +221,6 @@ public class AuctionService extends Thread {
 		LOGGER.info(messageText);
 		sqs.sendMessage(new SendMessageRequest(sendQueueURL, messageText));
 
-	}
-	
-	public static String getSendQueueURL() {
-		return sendQueueURL;
 	}
 
 }

@@ -1,6 +1,8 @@
-package auctionService;
+
 
 import router.Router;
+import router.RouterManager;
+import auctionService.AuctionCreationService;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -13,7 +15,7 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 public class Main {
 
 	/**
-	 * Main to start Auction module
+	 * Starts an instance of every module
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -34,6 +36,8 @@ public class Main {
         AuctionCreationService auctionCreationService = new AuctionCreationService(sqs);
         auctionCreationService.start();
         
+        RouterManager routerManager = new RouterManager(sqs, 1);
+        routerManager.start();
 
 
 	}

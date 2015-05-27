@@ -1,7 +1,7 @@
 package test.auctionService;
 
+import router.Router;
 import auctionService.AuctionService;
-import auctionService.Router;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
