@@ -30,7 +30,6 @@ public class AuctionManager {
 				return a;
 			}
 		}
-		// TODO Logging?
 		return null;
 	}
 }

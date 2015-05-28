@@ -35,7 +35,6 @@ public class Auction {
 				return s;
 			}
 		}
-		// TODO Logging?
 		return null;
 	}
 	

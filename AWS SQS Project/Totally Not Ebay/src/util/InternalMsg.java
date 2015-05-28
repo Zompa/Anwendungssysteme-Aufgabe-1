@@ -8,15 +8,11 @@ public class InternalMsg {
 	
 	public InternalMsg(Message m){
 		String[] msgParts = SimpleParser.getMessageAttributes(m);
-		
-		
 		this.command = msgParts[0].toUpperCase();
 		this.params = new String[msgParts.length-1];
 		for (int i=0;i< this.params.length;i++){
 			params[i] = msgParts[i+1].toUpperCase();
 		}
-		//TODO entfernen
-		System.out.println(this.toString());
 	}
 
 	public String getCommand() {

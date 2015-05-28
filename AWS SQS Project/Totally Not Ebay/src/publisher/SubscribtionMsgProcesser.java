@@ -17,10 +17,10 @@ public class SubscribtionMsgProcesser {
 		if (subAuction != null) {
 			Subscriber sub = new Subscriber(subscriberID);
 			subAuction.addSubscriber(sub);
-			// TODO Logging
+			SimpleLogger.log("Client " + subscriberID + " subscribed to auction " + auctionID );
 			sendAuctionStatus(subAuction, sub);
 		} else {
-			// TODO Logging
+			SimpleLogger.log("Subscription not possible, auction not found. Auction ID: " + auctionID );
 		}
 	}
 
@@ -32,10 +32,10 @@ public class SubscribtionMsgProcesser {
 			if (remSubscriber != null) {
 				subAuction.removeSubscriber(remSubscriber);
 			} else {
-				// TODO Logging
+				SimpleLogger.log("Client " + subscriberID + " unsibscribed from  auction " + auctionID );
 			}
 		} else {
-			// TODO Logging
+			SimpleLogger.log("Unsubscription not possible, auction not found. Auction ID: " + auctionID );
 		}
 	}
 
@@ -55,8 +55,9 @@ public class SubscribtionMsgProcesser {
 	private void processSubscriptionMsg(Message m) {
 		util.InternalMsg msg = new util.InternalMsg(m);		
 		int subscriberID = Integer.parseInt(msg.getParams()[0]);
-		int auctionID = Integer.parseInt(msg.getParams()[1]);
+		int auctionID = Integer.parseInt(msg.getParams()[1]);		
 
+		SimpleLogger.log("Process Subscription Message " + msg.toString());
 		switch (msg.getCommand()) {
 		case "SUBSCRIBE":
 			processSubscribe(subscriberID, auctionID);
@@ -77,7 +78,6 @@ public class SubscribtionMsgProcesser {
 				.getMessages();
 		for (Message message : messages) {
 			processSubscriptionMsg(message);
-			// TODO Logging
 			String messageRecieptHandle = message.getReceiptHandle();
 			sqs.deleteMessage(new DeleteMessageRequest(
 					SQSInformation.SubscribtionQueueUrl, messageRecieptHandle));
