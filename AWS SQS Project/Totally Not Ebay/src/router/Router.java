@@ -89,6 +89,7 @@ public class Router extends Thread {
 						.getMessageAttributes(nextMessage);
 				String queueURLfromRouterToAuctionManager = manager.getQueueURLForID(Integer.parseInt(messageAttributes[1]));
 				System.out.println(queueURLfromRouterToAuctionManager);
+				if (queueURLfromRouterToAuctionManager == null) throw new RuntimeException("auction unknown");
 				sqs.sendMessage(new SendMessageRequest(
 						queueURLfromRouterToAuctionManager, nextMessage.getBody()));
 			}

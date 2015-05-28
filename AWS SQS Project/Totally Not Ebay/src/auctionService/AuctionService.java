@@ -1,5 +1,6 @@
 package auctionService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -123,10 +124,12 @@ public class AuctionService extends Thread {
 	public void run() {
 		// setting end time
 		Calendar calendar = Calendar.getInstance(); // auctionTime
-		calendar.add(Calendar.SECOND, AUCTION_START_OFFSET);
-		startDate = calendar.getTime();
-		calendar.add(Calendar.SECOND, auctionTime);
-		endDate = calendar.getTime();
+	//	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+		startDate = new Date(calendar.getTime().getTime() + AUCTION_START_OFFSET*1000);
+	//	System.out.println(sdf.format(calendar.getTime()));
+		endDate = new Date(startDate.getTime() + auctionTime*1000);
+	//	System.out.println(sdf.format(startDate));
+	//	System.out.println(sdf.format(endDate));
 		broadcastAuctionScheduled();
 		try {
 			Thread.sleep(AUCTION_START_OFFSET * 1000);
@@ -134,8 +137,9 @@ public class AuctionService extends Thread {
 			interrupt();
 		}
 		broadcastAuctionStart();
+	//	System.out.println(sdf.format(Calendar.getInstance().getTime()));
 		// main loop: endTimeMillis is the end time of the auction
-		while (!isInterrupted() && Calendar.getInstance().before(endDate)) {
+		while (!isInterrupted() && Calendar.getInstance().getTime().before(endDate)) {
 			// check for new bids and process them
 			processBids(sqs.receiveMessage(receiveRequest).getMessages());
 
