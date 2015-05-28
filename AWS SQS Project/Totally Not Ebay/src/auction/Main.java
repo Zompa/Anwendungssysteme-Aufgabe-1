@@ -1,6 +1,6 @@
-package auctionService;
+package auction;
 
-import router.Router;
+import router.RouterThread;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -31,7 +31,7 @@ public class Main {
         AmazonSQS sqs = new AmazonSQSClient(credentials);
         sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
         
-        AuctionCreationService auctionCreationService = new AuctionCreationService(sqs);
+        AuctionCreator auctionCreationService = new AuctionCreator(sqs);
         auctionCreationService.start();
         
 

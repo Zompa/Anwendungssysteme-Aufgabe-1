@@ -1,4 +1,4 @@
-package auctionService;
+package auction;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,10 +23,10 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
  * @author Daniel
  * 
  */
-public class AuctionService extends Thread {
+public class AuctionThread extends Thread {
 
 	private final static String QUEUE_NAME_PREFIX = "Auction_Queue_";
-	private final static Logger LOGGER = Logger.getLogger(AuctionService.class
+	private final static Logger LOGGER = Logger.getLogger(AuctionThread.class
 			.getName());
 	private static final int AUCTION_START_OFFSET = 5;
 	private final AmazonSQS sqs;
@@ -64,7 +64,7 @@ public class AuctionService extends Thread {
 	 * @param auctionTime
 	 *            Time of the Auction in seconds
 	 */
-	public AuctionService(AmazonSQS sqs, String name, int auctionTime) {
+	public AuctionThread(AmazonSQS sqs, String name, int auctionTime) {
 		super();
 		this.sqs = sqs;
 		this.name = name;

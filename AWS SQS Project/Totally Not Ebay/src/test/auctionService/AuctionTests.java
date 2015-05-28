@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import auctionService.AuctionCreationService;
+import auction.AuctionCreator;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -41,7 +41,7 @@ public class AuctionTests {
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 
-		AuctionCreationService auctionCreationService = new AuctionCreationService(
+		AuctionCreator auctionCreationService = new AuctionCreator(
 				sqs);
 		auctionCreationService.start();
 		System.out.println("Create Auction");

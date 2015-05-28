@@ -1,7 +1,7 @@
 package test.auctionService;
 
-import router.Router;
-import auctionService.AuctionService;
+import router.RouterThread;
+import auction.AuctionThread;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -33,7 +33,7 @@ public class RouterTest extends Thread {
 
 		
 		//init
-		AuctionService auctionService = new AuctionService(sqs, "RouterTestAuction", 4);
+		AuctionThread auctionService = new AuctionThread(sqs, "RouterTestAuction", 4);
 		auctionService.start();
 		
 //		Router router = new Router(sqs);

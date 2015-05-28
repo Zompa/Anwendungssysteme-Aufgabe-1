@@ -1,4 +1,4 @@
-package auctionService;
+package auction;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -19,12 +19,12 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
  * @author Daniel
  * 
  */
-public class AuctionCreationService extends Thread {
+public class AuctionCreator extends Thread {
 
 	public static final String AUCTION_CREATION_QUEUE_NAME = "Create_Auction_Queue";
 
 	private final static Logger LOGGER = Logger
-			.getLogger(AuctionCreationService.class.getName());
+			.getLogger(AuctionCreator.class.getName());
 	private final AmazonSQS sqs;
 
 	/**
@@ -32,7 +32,7 @@ public class AuctionCreationService extends Thread {
 	 * 
 	 * @param sqs
 	 */
-	public AuctionCreationService(AmazonSQS sqs) {
+	public AuctionCreator(AmazonSQS sqs) {
 		this.sqs = sqs;
 
 		// init Queue
@@ -78,7 +78,7 @@ public class AuctionCreationService extends Thread {
 		try {
 			String[] attributes = SimpleParser.getMessageAttributes(m);
 			if (attributes[0].equals("CREATE_AUCTION")) {
-				new AuctionService(sqs, attributes[1],
+				new AuctionThread(sqs, attributes[1],
 						Integer.parseInt(attributes[2])).start();
 			} else {
 				LOGGER.info("WRONG MESSAGE: " + m.getBody());
