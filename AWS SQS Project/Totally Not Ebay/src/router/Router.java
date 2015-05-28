@@ -30,20 +30,10 @@ public class Router extends Thread {
 	private final static Logger LOGGER = Logger.getLogger(Router.class
 			.getName());
 	private final AmazonSQS sqs;
-	public static String bidQueueURL;
+	private final String bidQueueURL;
 	
 	private final ReceiveMessageRequest receiveMessageRequest;
-	//
-	// /** contains auctionIDs of all registered auctions
-	// *
-	// */
-	// private HashSet<Integer> auctionIDSet = new HashSet<>();
-
-	/**
-	 * contains valid bid messages for AuctionManager
-	 * 
-	 */
-	private List<Message> destinationBidList = new ArrayList<>();
+	
 	private final RouterManager manager;
 
 	public Router(AmazonSQS sqs, RouterManager manager) {
@@ -62,55 +52,9 @@ public class Router extends Thread {
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
-			//receiveMessagesfromAuctionManager();
-			destinationBidList = receiveMessagesfromClient();
-			sendBidsToAuctionManager(destinationBidList);
+			sendBidsToAuctionManager(receiveMessagesfromClient());
 		}
 	}
-
-//	/**
-//	 * Reads messages sent by AuctionManager concerning occurred changes (start
-//	 * of auction, end of auction). Stores new Auction_IDs to auctionIDSet when
-//	 * new auctions started. Removes Auction_IDs from auctionIDSet when an
-//	 * auction terminated.
-//	 * 
-//	 */
-//	public void receiveMessagesfromAuctionManager() {
-//		String queueURLfromAuctionManagerToRouter = AuctionService
-//				.getSendQueueURL();
-//		// LOGGER.info("Receiving messages from AuctionManager.\n");
-//		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-//				queueURLfromAuctionManagerToRouter);
-//		List<Message> receivedChangesfromAuctionManager = sqs.receiveMessage(
-//				receiveMessageRequest).getMessages();
-//
-//		for (Message receivedChangeMessage : receivedChangesfromAuctionManager) {
-//			try {
-//				String[] receivedChangeMessageString = SimpleParser
-//						.getMessageAttributes(receivedChangeMessage);
-//				// if(receivedChangeMessageString[0].equals("AUCTION_STARTED"))
-//				// {
-//				// auctionIDSet.add(Integer.parseInt(receivedChangeMessageString[1]));
-//				// LOGGER.info("Registered new auction");
-//				// }
-//				// else if(receivedChangeMessageString[0].equals("AUCTION_END"))
-//				// {
-//				// auctionIDSet.remove(Integer.parseInt(receivedChangeMessageString[1]));
-//				// LOGGER.info("Deleted auction");
-//				// } else LOGGER.info("No auctions updated");
-//
-//			} catch (Exception e) {
-//				LOGGER.info("An error occurred while updating the Auction_ID storage");
-//				e.printStackTrace();
-//			} finally {
-//				// delete message from queue
-//				String receiptHandle = receivedChangeMessage.getReceiptHandle();
-//				sqs.deleteMessage(new DeleteMessageRequest(
-//						queueURLfromAuctionManagerToRouter, receiptHandle));
-//				// LOGGER.info("Deleted Message from queue");
-//			}
-//		}
-//	}
 
 	/**
 	 * Reads all kinds of messages sent by clients.
@@ -124,31 +68,6 @@ public class Router extends Thread {
 		//Poll messages from server. Long poll. Waits 20 seconds
 		List<Message> receivedClientMessages = sqs.receiveMessage(
 				receiveMessageRequest).getMessages();
-
-//		for (Message clientMessage : receivedClientMessages) {
-//			try {
-//				String[] messageAttributes = SimpleParser
-//						.getMessageAttributes(clientMessage);
-//				// check if sent message contains an auctionID already contained
-//				// in auctionIDSet
-//				// System.out.println(Integer.parseInt(messageAttributes[1]));
-//				if (messageAttributes[0].equals("MAKE_BID")
-//						&& isInteger(messageAttributes[1])
-//						&& auctionIDSet.contains(Integer
-//								.parseInt(messageAttributes[1])))
-//					destinationBidList.add(clientMessage);
-//				else
-//					LOGGER.info("This client message does not include a valid auctionID");
-//			} catch (Exception e) {
-//				LOGGER.info("An error occurred while reading client messages");
-//				e.printStackTrace();
-//			} finally {
-//				// delete message from Bid_Queue
-//				String receiptHandle = clientMessage.getReceiptHandle();
-//				sqs.deleteMessage(new DeleteMessageRequest(bidQueueURL,
-//						receiptHandle));
-//			}
-//		}
 		return receivedClientMessages;
 	}
 
@@ -200,9 +119,4 @@ public class Router extends Thread {
 		}
 		return true;
 	}
-
-	public static String getBidQueueURL() {
-		return bidQueueURL;
-	}
-
 }
