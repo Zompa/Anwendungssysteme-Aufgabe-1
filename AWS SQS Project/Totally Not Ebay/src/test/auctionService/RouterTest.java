@@ -36,18 +36,18 @@ public class RouterTest extends Thread {
 		AuctionService auctionService = new AuctionService(sqs, "RouterTestAuction", 4);
 		auctionService.start();
 		
-		Router router = new Router(sqs);
-		router.start();
-		
-		//client message (bid)
-		try {
-			Thread.sleep(1000);
-		} catch(InterruptedException ioe) {
-			ioe.getCause();
-		}
-		
-		String messageBody = "MAKE_BID/666/42.23/Frido Fröhlich";
-		sqs.sendMessage(new SendMessageRequest(Router.getBidQueueURL(), messageBody));
+//		Router router = new Router(sqs);
+//		router.start();
+//		
+//		//client message (bid)
+//		try {
+//			Thread.sleep(1000);
+//		} catch(InterruptedException ioe) {
+//			ioe.getCause();
+//		}
+//		
+//		String messageBody = "MAKE_BID/666/42.23/Frido Fröhlich";
+//		sqs.sendMessage(new SendMessageRequest(Router.getBidQueueURL(), messageBody));
 
 	}
 }
