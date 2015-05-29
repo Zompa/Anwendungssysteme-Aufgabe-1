@@ -22,7 +22,7 @@ public class Client {
 	private String clientQueueURL;
 	private final AmazonSQS sqs;
 	private int choosenAuctionId;
-	private int highestBid;
+	private double highestBid;
 	private int highestBidId;
 	private Date auctionEnd;
 
@@ -72,7 +72,7 @@ public class Client {
 	// Reads all messages from Publisher
 	public void receiveMessagesfromPublisher() {
 
-		String queueURLfromPublisher = "ClientUpdateQueue" + id;
+		String queueURLfromPublisher = "Client_Update_Queue_" + id;
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
 				queueURLfromPublisher);
 		List<Message> receivedfromPublisher = sqs.receiveMessage(
@@ -81,14 +81,18 @@ public class Client {
 		for (Message receivedMessage : receivedfromPublisher) {
 			String[] message = SimpleParser
 					.getMessageAttributes(receivedMessage);
-			if (message[0] == "NEW_HIGHEST_BIDDER") {
+			for (String s : message) {
+				System.out.println(s);
+			}
+			if (message[0].equals("NEW_HIGHEST_BIDDER")) {
 				if (Integer.parseInt(message[1]) == choosenAuctionId) {
-					highestBid = Integer.parseInt(message[2]);
+					highestBid = Double.parseDouble(message[2]);
 					highestBidId = Integer.parseInt(message[3]);
+					setAuctionEnd(Long.parseLong(message[4]));
 				}
-			} else if (message[0] == "AUCTION_END") {
+			} else if (message[0].equals("AUCTION_END")) {
 				if (Integer.parseInt(message[1]) == choosenAuctionId) {
-					highestBid = Integer.parseInt(message[3]);
+					highestBid = Double.parseDouble(message[3]);
 					highestBidId = Integer.parseInt(message[2]);
 				}
 			}
@@ -127,7 +131,7 @@ public class Client {
 		return choosenAuctionId;
 	}
 
-	public int getHighestBid() {
+	public double getHighestBid() {
 		return highestBid;
 	}
 
