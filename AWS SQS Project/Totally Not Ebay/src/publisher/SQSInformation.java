@@ -8,7 +8,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
-import com.amazonaws.services.sqs.model.DeleteQueueRequest;
 
 public class SQSInformation {
 	public AmazonSQS getSqs() {
@@ -38,7 +37,7 @@ public class SQSInformation {
 		}
 
 		sqs = new AmazonSQSClient(credentials);
-		Region eur = Region.getRegion(Regions.EU_WEST_1);
+		Region eur = Region.getRegion(Regions.EU_CENTRAL_1);
 		sqs.setRegion(eur);
 		
 		//sqs.deleteQueue(new DeleteQueueRequest(SubscribtionQueueUrl));

@@ -2,19 +2,25 @@ package publisher;
 
 import java.util.List;
 
-import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class SubscribtionMsgProcesser {
-	private AmazonSQS sqs = Publisher.sqsInformation.getSqs();
+	
+	private AuctionManager auctionManager;
+	private SQSInformation sqsInformation;
+
+	public SubscribtionMsgProcesser(SQSInformation sqsInfo, AuctionManager auctionM){
+		this.auctionManager = auctionM;
+		this.sqsInformation = sqsInfo;		
+	}
 
 	private void processSubscribe(int subscriberID, int auctionID) {
-		Auction subAuction = Publisher.auctionManager.getAuctionByID(auctionID);
+		Auction subAuction = auctionManager.getAuctionByID(auctionID);
 		if (subAuction != null) {
-			Subscriber sub = new Subscriber(subscriberID);
+			Subscriber sub = new Subscriber(subscriberID, sqsInformation);
 			subAuction.addSubscriber(sub);
 			SimpleLogger.log("Client " + subscriberID + " subscribed to auction " + auctionID );
 			sendAuctionStatus(subAuction, sub);
@@ -24,7 +30,7 @@ public class SubscribtionMsgProcesser {
 	}
 
 	private void processUnSubscribe(int subscriberID, int auctionID) {
-		Auction subAuction = Publisher.auctionManager.getAuctionByID(auctionID);
+		Auction subAuction = auctionManager.getAuctionByID(auctionID);
 		if (subAuction != null) {
 			Subscriber remSubscriber = subAuction
 					.getSubscriberByID(subscriberID);
@@ -47,7 +53,7 @@ public class SubscribtionMsgProcesser {
 	 *            receiving Subscriber
 	 */
 	private void sendAuctionStatus(Auction auct, Subscriber recSubscriber) {
-		sqs.sendMessage(new SendMessageRequest(recSubscriber
+		sqsInformation.getSqs().sendMessage(new SendMessageRequest(recSubscriber
 				.getSubscriberQueueUrl(), auct.getAuctionHighestBidderMsg()));
 	}
 
@@ -77,14 +83,15 @@ public class SubscribtionMsgProcesser {
 	 */
 	public void fetchSubscriptionMsgs() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-				Publisher.sqsInformation.getSubscribtionQueueUrl());
-		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
+				sqsInformation.getSubscribtionQueueUrl());
+		//SimpleLogger.log(Publisher.sqsInformation.getSubscribtionQueueUrl());
+		List<Message> messages = sqsInformation.getSqs().receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			processSubscriptionMsg(message);
 			String messageRecieptHandle = message.getReceiptHandle();
-			sqs.deleteMessage(new DeleteMessageRequest(
-					Publisher.sqsInformation.getSubscribtionQueueUrl(), messageRecieptHandle));
+			sqsInformation.getSqs().deleteMessage(new DeleteMessageRequest(
+					sqsInformation.getSubscribtionQueueUrl(), messageRecieptHandle));
 		}
 	}
 }

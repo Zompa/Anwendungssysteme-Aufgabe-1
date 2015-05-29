@@ -1,13 +1,9 @@
 package publisher;
 
-import java.util.Random;
-
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-
 // TODO Hat mit Skalierbarkeit ja mal gar nix zu tun 
 public class Publisher extends Thread{
-	public static AuctionManager auctionManager;
-	public static SQSInformation sqsInformation;
+	private AuctionManager auctionManager;
+	private SQSInformation sqsInformation;
 	private SubscribtionMsgProcesser smb;
 	private BroadcastMsgProcessor bmp;
 	
@@ -15,8 +11,8 @@ public class Publisher extends Thread{
 	public Publisher(int myID) {
 		sqsInformation = new SQSInformation(myID);
 		auctionManager = new AuctionManager();
-		smb = new SubscribtionMsgProcesser();
-		bmp = new BroadcastMsgProcessor();
+		smb = new SubscribtionMsgProcesser(sqsInformation, auctionManager);
+		bmp = new BroadcastMsgProcessor(sqsInformation, auctionManager);
 		SimpleLogger.log("Publisher Created. ID: " + myID);
 	}
 
@@ -25,20 +21,12 @@ public class Publisher extends Thread{
 		this.smb.fetchSubscriptionMsgs();
 		this.bmp.fetchBroadcastMsgs();
 		try {
-			Thread.sleep(100);
+			Thread.sleep(200);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		}
 	}	
-
-	public static AuctionManager getAuctionManager() {
-		return auctionManager;
-	}
-
-	public static SQSInformation getSqsInformation() {
-		return sqsInformation;
-	}
 
 
 	

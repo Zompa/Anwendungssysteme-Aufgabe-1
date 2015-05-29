@@ -2,15 +2,20 @@ package publisher;
 
 import java.util.List;
 
-import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class BroadcastMsgProcessor {
-	private AmazonSQS sqs = Publisher.sqsInformation.getSqs();
+	private AuctionManager auctionManager;
+	private SQSInformation sqsInformation;
 
+	public BroadcastMsgProcessor(SQSInformation sqsInfo, AuctionManager auctionM){
+		this.auctionManager = auctionM;
+		this.sqsInformation = sqsInfo;		
+	}
+	
 	private void processBroadcastMsg(Message m) {
 		util.InternalMsg msg = new util.InternalMsg(m);
 		if (msg.getCommand() == "INVALID"){
@@ -42,8 +47,8 @@ public class BroadcastMsgProcessor {
 	}
 
 	private void auctionScheduled(int auctID) {
-		if (Publisher.auctionManager.hasAuctionWithID(auctID) == false){
-		Publisher.auctionManager.addAuction(new Auction(auctID));
+		if (auctionManager.hasAuctionWithID(auctID) == false){
+		auctionManager.addAuction(new Auction(auctID));
 		SimpleLogger.log("Created new auction. ID: " + auctID);		
 		}
 		else{
@@ -52,14 +57,14 @@ public class BroadcastMsgProcessor {
 	}
 
 	private void newHighestBidder(int auctID, double bid, int bidderID) {
-		Auction updateAuction = Publisher.auctionManager.getAuctionByID(auctID);
+		Auction updateAuction = auctionManager.getAuctionByID(auctID);
 		if (updateAuction != null) {
 			if (bid > updateAuction.getHighestBid()) {
 				updateAuction.setHighestBid(bid);
 				updateAuction.setHighestBidder(bidderID);
 				for (Subscriber s : updateAuction.getSubscriberList()) {
 					String msg = updateAuction.getAuctionHighestBidderMsg();
-					sqs.sendMessage(new SendMessageRequest(s
+					sqsInformation.getSqs().sendMessage(new SendMessageRequest(s
 							.getSubscriberQueueUrl(), msg));
 					SimpleLogger.log("Sent Message: " + msg + " to ClientdID "
 							+ s.getSubscriberID());
@@ -71,8 +76,7 @@ public class BroadcastMsgProcessor {
 		}
 		else{
 			SimpleLogger.log("Update highest bidder not posible: Auction does not exist. ID:" + auctID);
-		}
-		
+		}		
 	}
 
 	private void auctionEnd(int auctID, int winnerID, double winningBid) {
@@ -84,14 +88,15 @@ public class BroadcastMsgProcessor {
 	 */
 	public void fetchBroadcastMsgs() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-				Publisher.sqsInformation.getReceiveBroadcastQueueUrl());
-		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
+				sqsInformation.getReceiveBroadcastQueueUrl());
+		//SimpleLogger.log(sqsInformation.getReceiveBroadcastQueueUrl());
+		List<Message> messages = sqsInformation.getSqs().receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			processBroadcastMsg(message);
 			String messageRecieptHandle = message.getReceiptHandle();
-			sqs.deleteMessage(new DeleteMessageRequest(
-					Publisher.sqsInformation.getReceiveBroadcastQueueUrl(),
+			sqsInformation.getSqs().deleteMessage(new DeleteMessageRequest(
+					sqsInformation.getReceiveBroadcastQueueUrl(),
 					messageRecieptHandle));
 		}
 	}
