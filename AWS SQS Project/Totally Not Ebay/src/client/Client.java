@@ -1,6 +1,7 @@
 package client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.amazonaws.services.sqs.AmazonSQS;
@@ -12,41 +13,37 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 import util.SimpleParser;
 
-public class Client{
+public class Client {
 	// Attribute
 	private int id;
 	private ArrayList<Integer> auctionIDs = new ArrayList<Integer>();
 	public static final String CLIENT_QUEUE_NAME = "Client_Update_Queue_";
+	@SuppressWarnings("unused")
 	private String clientQueueURL;
 	private final AmazonSQS sqs;
 	private int choosenAuctionId;
 	private int highestBid;
 	private int highestBidId;
-	private String auctionEnd;
+	private Date auctionEnd;
 
+	// Constructor for the client with a fixed auction number
 	public Client(AmazonSQS sqs) {
 		auctionIDs = new ArrayList<Integer>();
-		auctionIDs.add(6666);
+		auctionIDs.add(666);// the id of the only auction in the system
+		id = 42;// TODO own client id
 		this.sqs = sqs;
-		// initialize the client's clientUpdateQueue in the publisher can drop
-		// messages
+		// initialize the client's clientUpdateQueue in which the publisher can
+		// drop messages
 		CreateQueueRequest clientUpdateQueueRequest = new CreateQueueRequest(
 				CLIENT_QUEUE_NAME + id);
 		clientQueueURL = sqs.createQueue(clientUpdateQueueRequest)
 				.getQueueUrl();
 	}
 
-	public Client() {
-		sqs = null;
-		auctionIDs = new ArrayList<Integer>();
-		auctionIDs.add(6666);
-	}
-
 	// Generates message and destination for subscribe message and then sends it
 	private void subscribe(int auctionId) {
 		String queueURLSubscribe = "SubscribeQueue";
-		String subscribeMessage = "SUBSCRIBE/" + id + "/" + choosenAuctionId;// TODO
-																				// subscribeMessage
+		String subscribeMessage = "SUBSCRIBE/" + id + "/" + choosenAuctionId;
 		try {
 			sqs.sendMessage(new SendMessageRequest(queueURLSubscribe,
 					subscribeMessage));
@@ -58,10 +55,10 @@ public class Client{
 
 	// Generates message and destination for unsubscribe message and then sends
 	// it
-	private void unsubscribe(int auctionId) {
+	protected void unsubscribe(int auctionId) {
 		String queueURLUnsubscribe = "SubscribeQueue";
 		String unsubscribeMessage = "UNSUBSCRIBE/" + id + "/"
-				+ choosenAuctionId;// TODO unsubscribeMessage
+				+ choosenAuctionId;
 		try {
 			sqs.sendMessage(new SendMessageRequest(queueURLUnsubscribe,
 					unsubscribeMessage));
@@ -84,7 +81,17 @@ public class Client{
 		for (Message receivedMessage : receivedfromPublisher) {
 			String[] message = SimpleParser
 					.getMessageAttributes(receivedMessage);
-			// TODO deal with messages
+			if (message[0] == "NEW_HIGHEST_BIDDER") {
+				if (Integer.parseInt(message[1]) == choosenAuctionId) {
+					highestBid = Integer.parseInt(message[2]);
+					highestBidId = Integer.parseInt(message[3]);
+				}
+			} else if (message[0] == "AUCTION_END") {
+				if (Integer.parseInt(message[1]) == choosenAuctionId) {
+					highestBid = Integer.parseInt(message[3]);
+					highestBidId = Integer.parseInt(message[2]);
+				}
+			}
 
 			// delete message from queueURLfromPublisher
 			String receiptHandle = receivedMessage.getReceiptHandle();
@@ -94,11 +101,10 @@ public class Client{
 	}
 
 	// Generates message and destination for make bid and then sends it
-	public void sendBidToRouter(int bid) {
-
+	public void sendBidToRouter(double bid) {
 		String queueURLfromClientToRouter = "Bid_Queue";
 		String bidMessage = "MAKE_BID/" + choosenAuctionId + "/" + bid + "/"
-				+ id;// TODO bidMessage
+				+ id;
 		try {
 			sqs.sendMessage(new SendMessageRequest(queueURLfromClientToRouter,
 					bidMessage));
@@ -108,7 +114,7 @@ public class Client{
 		}
 	}
 
-	// Ab hier getter und setterak
+	// From here on only getter and setter
 	public int getClientId() {
 		return id;
 	}
@@ -129,10 +135,8 @@ public class Client{
 		return highestBidId;
 	}
 
-	public String getAuctionEnd() {
-		return auctionEnd;
-	}
-
+	// sets the choosenAuctionID and automatically subscribes to the new action
+	// and unsubscribes to old auction
 	public void setChoosenAuctionId(int choosenAuctionId) {
 		if (this.choosenAuctionId != 0) {
 			unsubscribe(this.choosenAuctionId);
@@ -153,8 +157,12 @@ public class Client{
 		this.auctionIDs = auctionIDs;
 	}
 
-	public void setAuctionEnd(String auctionEnd) {
-		this.auctionEnd = auctionEnd;
+	public Date getAuctionEnd() {
+		return auctionEnd;
+	}
+
+	public void setAuctionEnd(long date) {
+		auctionEnd = new Date(date);
 	}
 
 }

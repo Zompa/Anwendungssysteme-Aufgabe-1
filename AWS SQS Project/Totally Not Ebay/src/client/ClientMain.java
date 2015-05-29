@@ -1,4 +1,5 @@
 package client;
+
 import java.util.ArrayList;
 
 import com.amazonaws.AmazonClientException;
@@ -12,18 +13,17 @@ import com.amazonaws.services.sqs.AmazonSQSClient;
 public class ClientMain {
 	public static void main(String[] args) {
 		AWSCredentials credentials = null;
-        try {
-            credentials = new ProfileCredentialsProvider("default").getCredentials();
-        } catch (Exception e) {
-            throw new AmazonClientException(
-                    "Cannot load the credentials from the credential profiles file. " +
-                    "Please make sure that your credentials file is at the correct " +
-                    "location (C:\\Users\\Daniel\\.aws\\credentials), and is in valid format.",
-                    e);
-        }
+		try {
+			credentials = new ProfileCredentialsProvider("default")
+					.getCredentials();
+		} catch (Exception e) {
+			throw new AmazonClientException(
+					"Cannot load the credentials from the credential profiles file. ",
+					e);
+		}
 
-        AmazonSQS sqs = new AmazonSQSClient(credentials);
-        sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
+		AmazonSQS sqs = new AmazonSQSClient(credentials);
+		sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 		Client c = new Client(sqs);
 		ClientGUI test = new ClientGUI(c);
 	}

@@ -11,15 +11,18 @@ public class ClientGUI {
 	JFrame frame;
 	JPanel middle;
 
+	@SuppressWarnings("static-access")
+	// Generates the window
 	public ClientGUI(final Client c) {
 		this.c = c;
 		frame = new JFrame("Not ebay");
 		frame.setLayout(new BorderLayout());
 
-		// die linke Seite
+		// the left side of the window
 		JPanel left = new JPanel();
-		left.setLayout(new GridLayout(4, 1, 10,10));
+		left.setLayout(new GridLayout(4, 1, 10, 10));
 
+		// the button for bidding
 		JButton bieten = new JButton("Bieten");
 
 		bieten.addActionListener(new ActionListener() {
@@ -32,17 +35,21 @@ public class ClientGUI {
 		});
 		left.add(bieten);
 
+		// the button for choosing an auction
 		JButton auktion = new JButton("Auktion auswählen");
 		auktion.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				chooseAuktion(c, frame);
+				c.receiveMessagesfromPublisher();
+				drawInformationPanel();
 
 			}
 		});
 		left.add(auktion);
-		
+
+		// the button for refreshing the information
 		JButton aktualisieren = new JButton("Aktualisieren");
 		aktualisieren.addActionListener(new ActionListener() {
 
@@ -56,11 +63,15 @@ public class ClientGUI {
 
 		left.add(aktualisieren);
 
+		// a button to end the application
 		JButton beenden = new JButton("Beenden");
 		beenden.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				if (c.getChoosenAuctionId() != 0) {
+					c.unsubscribe(c.getChoosenAuctionId());
+				}
 				System.exit(0);
 
 			}
@@ -69,7 +80,7 @@ public class ClientGUI {
 
 		frame.add(left, BorderLayout.WEST);
 
-		// die Mitte
+		// the middle of the window
 		middle = new JPanel();
 		middle.setLayout(new GridLayout(5, 1, 20, 5));
 		middle.add(new JLabel("Meine ID ist: " + c.getClientId()));
@@ -88,6 +99,7 @@ public class ClientGUI {
 		frame.setSize(600, 400);
 	}
 
+	// a method to repaint the middle panel
 	public void drawInformationPanel() {
 		middle.removeAll();
 		middle.setLayout(new GridLayout(5, 1, 20, 5));
@@ -100,10 +112,10 @@ public class ClientGUI {
 				+ c.getHighestBidId()));
 		middle.add(new JLabel("Das Auktionsende ist: " + c.getAuctionEnd()));
 		middle.validate();
-		
 
 	}
 
+	// a little pop up menu for choosing an auction
 	protected void chooseAuktion(Client c, JFrame frame) {
 		int size = c.getAuctionIDs().size();
 		Integer[] auctionIds = new Integer[size];
@@ -115,21 +127,32 @@ public class ClientGUI {
 				JOptionPane.QUESTION_MESSAGE, null, auctionIds,
 				(Integer) c.getChoosenAuctionId());
 		c.setChoosenAuctionId(newid);
-		drawInformationPanel();
 
 	}
 
+	// a little pop up menu to enter your bid
 	protected void bid() {
 		String gebot = JOptionPane
 				.showInputDialog("Bitte ihr Gebot für Auktion "
-						+ c.getChoosenAuctionId() + " eingeben");
+						+ c.getChoosenAuctionId()
+						+ " eingeben (maximal zwei Nachkommastellen)");
 		try {
-			int bid = Integer.parseInt(gebot);
+			double bid = Double.parseDouble(gebot);
 			if (bid <= 0) {
 				JOptionPane.showMessageDialog(null,
-						"Es wurde kein gültiges Gebot eingegeben");
+						"Es wurde ein Gebot kleiner als null eingegeben");
 			} else {
-				c.sendBidToRouter(bid);
+				/*String[] parts = gebot.split(".");
+
+				if (parts[1].length() > 2) {
+					JOptionPane
+							.showMessageDialog(null,
+									"Es wurden mehr als zwei Nachkommastellen eingegeben");
+				}
+
+				else {*/
+					c.sendBidToRouter(bid);
+				//}
 			}
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(null,
