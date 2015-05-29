@@ -77,20 +77,20 @@ public class RouterThread extends Thread {
 	 */
 	public void sendBidsToAuctionManager(List<Message> destinationBidList) {
 		// LOGGER.info("Sending messages to AuctionManager.\n");
-		for (Message nextMessage : destinationBidList) {
+		for (Message m : destinationBidList) {
 			try {
-				String[] messageAttributes = SimpleParser.getMessageAttributes(nextMessage);
+				String[] messageAttributes = SimpleParser.getMessageAttributes(m);
 				String queueURLfromRouterToAuctionManager = manager.getQueueURLForID(Integer.parseInt(messageAttributes[1]));
 				LOGGER.info(queueURLfromRouterToAuctionManager);
 				if (queueURLfromRouterToAuctionManager == null) throw new RuntimeException("auction unknown");
 				sqs.sendMessage(new SendMessageRequest(
-						queueURLfromRouterToAuctionManager, nextMessage.getBody()));
+						queueURLfromRouterToAuctionManager, m.getBody()));
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
 			finally {
-	            String messageReceiptHandle = nextMessage.getReceiptHandle();
+	            String messageReceiptHandle = m.getReceiptHandle();
 	            sqs.deleteMessage(new DeleteMessageRequest(ROUTER_QUEUE_NAME, messageReceiptHandle));
 			}
 		}
