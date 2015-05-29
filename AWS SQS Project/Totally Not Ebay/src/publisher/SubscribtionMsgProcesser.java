@@ -58,6 +58,7 @@ public class SubscribtionMsgProcesser {
 		int auctionID = Integer.parseInt(msg.getParams()[1]);		
 
 		SimpleLogger.log("Process Subscription Message " + msg.toString());
+		//TODO nicht verarbeitbare Nachrichten verkraften
 		switch (msg.getCommand()) {
 		case "SUBSCRIBE":
 			processSubscribe(subscriberID, auctionID);
