@@ -5,7 +5,6 @@ import java.util.Random;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 // TODO Hat mit Skalierbarkeit ja mal gar nix zu tun 
-// TODO Queues aufräumen
 public class Publisher {
 	public static AuctionManager auctionManager;
 	
@@ -30,9 +29,9 @@ public class Publisher {
 		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/23/666"));
 
 		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "NEW_HIGHEST_BIDDER/666/42.2/12"));
-
-		Random rand = new Random();		
+		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "STRANGEMESSAGE"));
 		
+		Random rand = new Random();		
 		while (true){
 			smb.fetchSubscriptionMsgs();
 			bmp.fetchBroadcastMsgs();

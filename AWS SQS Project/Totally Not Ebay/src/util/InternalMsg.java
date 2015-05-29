@@ -7,7 +7,7 @@ public class InternalMsg {
 	private String[] params;
 	
 	public InternalMsg(Message m){
-		//TODO nicht verarbeitbare Nachrichten verkraften
+		//Wir können den Nahrichtenformaten trauen 
 		String[] msgParts = SimpleParser.getMessageAttributes(m);
 		this.command = msgParts[0].toUpperCase();
 		this.params = new String[msgParts.length-1];

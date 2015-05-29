@@ -3,7 +3,7 @@ package publisher;
 import java.util.ArrayList;
 
 public class AuctionManager {
-	private ArrayList<Auction> activeAuctions; // TODO evtl nicht der beste Typ
+	private ArrayList<Auction> activeAuctions; 
 
 	public AuctionManager() {
 		activeAuctions = new ArrayList<Auction>();
@@ -31,5 +31,14 @@ public class AuctionManager {
 			}
 		}
 		return null;
+	}
+	
+	public boolean hasAuctionWithID(int auctID){
+		for (Auction a : activeAuctions){
+			if (a.getAuctionID() == auctID){
+				return true;
+			}
+		}
+		return false;
 	}
 }

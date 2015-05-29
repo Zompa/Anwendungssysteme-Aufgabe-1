@@ -7,7 +7,7 @@ public class Auction {
 	private int AuctionID;
 	private double highestBid; 
 	private int highestBidder;
-	private ArrayList<Subscriber> SubscriberList; // TODO Was ist die beste Java Liste hier?
+	private ArrayList<Subscriber> SubscriberList; 
 	
 	public Auction(int auctID){
 		this.AuctionID = auctID;

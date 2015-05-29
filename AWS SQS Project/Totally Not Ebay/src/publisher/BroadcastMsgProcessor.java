@@ -16,7 +16,6 @@ public class BroadcastMsgProcessor {
 		SimpleLogger.log("Process Broadcast Message " + msg.toString());
 		int auctionID = Integer.parseInt(msg.getParams()[0]);
 
-		// TODO nicht verarbeitbare Nachrichten verkraften
 		switch (msg.getCommand()) {
 		case "AUCTION_SCHEDULED":
 			auctionScheduled(auctionID);
@@ -40,9 +39,13 @@ public class BroadcastMsgProcessor {
 	}
 
 	private void auctionScheduled(int auctID) {
-		// nicht tun wenn bereits vorhanden
+		if (Publisher.auctionManager.hasAuctionWithID(auctID) == false){
 		Publisher.auctionManager.addAuction(new Auction(auctID));
 		SimpleLogger.log("Created new auction. ID: " + auctID);		
+		}
+		else{
+			SimpleLogger.log("Auction not created - already exists. ID: " + auctID);
+		}
 	}
 
 	private void newHighestBidder(int auctID, double bid, int bidderID) {

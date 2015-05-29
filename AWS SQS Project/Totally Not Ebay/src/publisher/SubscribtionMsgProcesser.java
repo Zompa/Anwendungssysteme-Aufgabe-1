@@ -32,7 +32,7 @@ public class SubscribtionMsgProcesser {
 			if (remSubscriber != null) {
 				subAuction.removeSubscriber(remSubscriber);
 			} else {
-				SimpleLogger.log("Client " + subscriberID + " unsibscribed from  auction " + auctionID );
+				SimpleLogger.log("Client " + subscriberID + " unsubscribed from  auction " + auctionID );
 			}
 		} else {
 			SimpleLogger.log("Unsubscription not possible, auction not found. Auction ID: " + auctionID );
@@ -58,7 +58,6 @@ public class SubscribtionMsgProcesser {
 		int auctionID = Integer.parseInt(msg.getParams()[1]);		
 
 		SimpleLogger.log("Process Subscription Message " + msg.toString());
-		//TODO nicht verarbeitbare Nachrichten verkraften
 		switch (msg.getCommand()) {
 		case "SUBSCRIBE":
 			processSubscribe(subscriberID, auctionID);
@@ -66,6 +65,8 @@ public class SubscribtionMsgProcesser {
 		case "UNSUBSCRIBE":
 			processUnSubscribe(subscriberID, auctionID);
 			break;
+		default:
+			SimpleLogger.log("Subscription Message could not be processed. Msg: " + msg.toString());			
 		}
 	}
 
