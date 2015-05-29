@@ -7,7 +7,7 @@ public class Subscriber {
 
 	private int subscriberID;
 	private String SubscriberQueueUrl;
-	private AmazonSQS sqs = SQSInformation.sqs;
+	private AmazonSQS sqs = Publisher.sqsInformation.getSqs();
 
 	
 	public int getSubscriberID() {
@@ -23,7 +23,6 @@ public class Subscriber {
 		//TODO Was passiert wenn Queue schon vorhanden?
 		CreateQueueRequest createQueueRequest = new CreateQueueRequest("CLIENT_UPDATE_" + this.subscriberID);
 		SubscriberQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();		
-		
 	}
 	
 	

@@ -9,7 +9,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class SubscribtionMsgProcesser {
-	private AmazonSQS sqs = SQSInformation.sqs;
+	private AmazonSQS sqs = Publisher.sqsInformation.getSqs();
 
 	private void processSubscribe(int subscriberID, int auctionID) {
 		Auction subAuction = Publisher.auctionManager.getAuctionByID(auctionID);
@@ -77,14 +77,14 @@ public class SubscribtionMsgProcesser {
 	 */
 	public void fetchSubscriptionMsgs() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-				SQSInformation.SubscribtionQueueUrl);
+				Publisher.sqsInformation.getSubscribtionQueueUrl());
 		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			processSubscriptionMsg(message);
 			String messageRecieptHandle = message.getReceiptHandle();
 			sqs.deleteMessage(new DeleteMessageRequest(
-					SQSInformation.SubscribtionQueueUrl, messageRecieptHandle));
+					Publisher.sqsInformation.getSubscribtionQueueUrl(), messageRecieptHandle));
 		}
 	}
 }

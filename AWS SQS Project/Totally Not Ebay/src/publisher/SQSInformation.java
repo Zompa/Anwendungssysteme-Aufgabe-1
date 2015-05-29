@@ -11,11 +11,23 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.DeleteQueueRequest;
 
 public class SQSInformation {
-	public static AmazonSQS sqs;
-	public static String SubscribtionQueueUrl;
-	public static String ReceiveBroadcastQueueUrl;
+	public AmazonSQS getSqs() {
+		return sqs;
+	}
 
-	public static void initialize() {
+	public String getSubscribtionQueueUrl() {
+		return SubscribtionQueueUrl;
+	}
+
+	public String getReceiveBroadcastQueueUrl() {
+		return ReceiveBroadcastQueueUrl;
+	}
+
+	private AmazonSQS sqs;
+	private String SubscribtionQueueUrl;
+	private String ReceiveBroadcastQueueUrl;
+
+	public SQSInformation(int publisherID) {
 		AWSCredentials credentials = null;
 		try {
 			credentials = new ProfileCredentialsProvider("default")
@@ -30,10 +42,10 @@ public class SQSInformation {
 		sqs.setRegion(eur);
 		
 		//sqs.deleteQueue(new DeleteQueueRequest(SubscribtionQueueUrl));
-		CreateQueueRequest createQueueRequest = new CreateQueueRequest("SubscribeQueue");
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest("SubscribeQueue" + publisherID);
 		SubscribtionQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();	
 		
-		createQueueRequest = new CreateQueueRequest("AUCTION_BROADCAST_QUEUE");
+		createQueueRequest = new CreateQueueRequest("AUCTION_BROADCAST_QUEUE"+ publisherID);
 		ReceiveBroadcastQueueUrl = sqs.createQueue(createQueueRequest).getQueueUrl();
 	}
 }

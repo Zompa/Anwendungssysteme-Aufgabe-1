@@ -9,7 +9,7 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 public class BroadcastMsgProcessor {
-	private AmazonSQS sqs = SQSInformation.sqs;
+	private AmazonSQS sqs = Publisher.sqsInformation.getSqs();
 
 	private void processBroadcastMsg(Message m) {
 		util.InternalMsg msg = new util.InternalMsg(m);
@@ -84,14 +84,14 @@ public class BroadcastMsgProcessor {
 	 */
 	public void fetchBroadcastMsgs() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-				SQSInformation.ReceiveBroadcastQueueUrl);
+				Publisher.sqsInformation.getReceiveBroadcastQueueUrl());
 		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			processBroadcastMsg(message);
 			String messageRecieptHandle = message.getReceiptHandle();
 			sqs.deleteMessage(new DeleteMessageRequest(
-					SQSInformation.ReceiveBroadcastQueueUrl,
+					Publisher.sqsInformation.getReceiveBroadcastQueueUrl(),
 					messageRecieptHandle));
 		}
 	}

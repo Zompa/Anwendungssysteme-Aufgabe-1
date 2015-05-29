@@ -5,44 +5,45 @@ import java.util.Random;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 
 // TODO Hat mit Skalierbarkeit ja mal gar nix zu tun 
-public class Publisher {
+public class Publisher extends Thread{
 	public static AuctionManager auctionManager;
+	public static SQSInformation sqsInformation;
+	private SubscribtionMsgProcesser smb;
+	private BroadcastMsgProcessor bmp;
 	
 
-	public static void main(String[] args) {
-		SQSInformation.initialize();
+	public Publisher(int myID) {
+		sqsInformation = new SQSInformation(myID);
 		auctionManager = new AuctionManager();
+		smb = new SubscribtionMsgProcesser();
+		bmp = new BroadcastMsgProcessor();
+		SimpleLogger.log("Publisher Created. ID: " + myID);
+	}
+
+	public void run(){
+		while (!isInterrupted()){
+		this.smb.fetchSubscriptionMsgs();
+		this.bmp.fetchBroadcastMsgs();
 		try {
-			test1();
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		}
+	}	
+
+	public static AuctionManager getAuctionManager() {
+		return auctionManager;
 	}
+
+	public static SQSInformation getSqsInformation() {
+		return sqsInformation;
+	}
+
 
 	
-	private static void test1() throws InterruptedException{
-		SubscribtionMsgProcesser smb = new SubscribtionMsgProcesser();
-		BroadcastMsgProcessor bmp = new BroadcastMsgProcessor();
-		
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "AUCTION_SCHEDULED/666/STARTZEITPUNKT/ENDZEITPUNKT/AUCTION_NAME)"));
-
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/23/666"));
-
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "NEW_HIGHEST_BIDDER/666/42.2/12"));
-		//SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "STRANGEMESSAGE"));
-		
-		Random rand = new Random();		
-		while (true){
-			smb.fetchSubscriptionMsgs();
-			bmp.fetchBroadcastMsgs();
-			SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/"+rand.nextInt() +"/666"));
-
-			SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "NEW_HIGHEST_BIDDER/666/"+rand.nextDouble() +"/12"));
-			Thread.sleep(1000);
-		}
-		
-		
-	}
+	
+	
 	/*
 	private static void test2(){
 		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/12/23"));
