@@ -29,7 +29,7 @@ public class Publisher {
 		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/23/666"));
 
 		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "NEW_HIGHEST_BIDDER/666/42.2/12"));
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "STRANGEMESSAGE"));
+		//SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.ReceiveBroadcastQueueUrl, "STRANGEMESSAGE"));
 		
 		Random rand = new Random();		
 		while (true){

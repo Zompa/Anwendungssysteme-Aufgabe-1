@@ -13,6 +13,9 @@ public class BroadcastMsgProcessor {
 
 	private void processBroadcastMsg(Message m) {
 		util.InternalMsg msg = new util.InternalMsg(m);
+		if (msg.getCommand() == "INVALID"){
+			return;
+		}
 		SimpleLogger.log("Process Broadcast Message " + msg.toString());
 		int auctionID = Integer.parseInt(msg.getParams()[0]);
 

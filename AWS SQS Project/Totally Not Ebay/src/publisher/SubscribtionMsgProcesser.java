@@ -1,7 +1,6 @@
 package publisher;
 
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
@@ -54,6 +53,9 @@ public class SubscribtionMsgProcesser {
 
 	private void processSubscriptionMsg(Message m) {
 		util.InternalMsg msg = new util.InternalMsg(m);		
+		if (msg.getCommand() == "INVALID"){
+			return;
+		}
 		int subscriberID = Integer.parseInt(msg.getParams()[0]);
 		int auctionID = Integer.parseInt(msg.getParams()[1]);		
 
