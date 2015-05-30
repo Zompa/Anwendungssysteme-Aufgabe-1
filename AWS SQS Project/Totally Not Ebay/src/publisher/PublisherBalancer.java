@@ -24,84 +24,88 @@ public class PublisherBalancer {
 	private static String globalBroadcastQueueUrl;
 	private static String globalSubscribtionQueueUrl;
 	private static AmazonSQS sqs;
-	private static ArrayList<String> BroadcastQueueList ;
-	private static ArrayList<String> SubscriptionQueueList ;
+	private static ArrayList<String> BroadcastQueueList;
+	private static ArrayList<String> SubscriptionQueueList;
 
 	public static void main(String[] args) {
 		setSqsInfo();
 		BroadcastQueueList = new ArrayList<String>();
 		SubscriptionQueueList = new ArrayList<String>();
-		
-		for (int i= 0;i < 2; i++){
+
+		for (int i = 0; i < 2; i++) {
 			createPublisher();
 		}
-		
+
 		try {
 			test();
+			live();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	static private void createPublisher(){
+
+	static private void createPublisher() {
 		Publisher p = new Publisher(nextPublisherID);
-		CreateQueueRequest createQueueRequest = new CreateQueueRequest("AUCTION_BROADCAST_QUEUE" + nextPublisherID);
-		BroadcastQueueList.add(sqs.createQueue(createQueueRequest).getQueueUrl());
-		createQueueRequest = new CreateQueueRequest("SubscribeQueue" + nextPublisherID);
-		SubscriptionQueueList.add(sqs.createQueue(createQueueRequest).getQueueUrl());
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest(
+				"AUCTION_BROADCAST_QUEUE" + nextPublisherID);
+		BroadcastQueueList.add(sqs.createQueue(createQueueRequest)
+				.getQueueUrl());
+		createQueueRequest = new CreateQueueRequest("SubscribeQueue"
+				+ nextPublisherID);
+		SubscriptionQueueList.add(sqs.createQueue(createQueueRequest)
+				.getQueueUrl());
 		p.start();
 		nextPublisherID++;
 	}
-	
-	private static void processSubscription(){
+
+	private static void processSubscription() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
-				globalSubscribtionQueueUrl);;
+				globalSubscribtionQueueUrl);
+		;
 		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			sendSubscriptionToCorrectPublisher(message);
 			String messageRecieptHandle = message.getReceiptHandle();
 			sqs.deleteMessage(new DeleteMessageRequest(
-					globalSubscribtionQueueUrl,messageRecieptHandle));
+					globalSubscribtionQueueUrl, messageRecieptHandle));
 		}
 	}
-	
-	private static void sendSubscriptionToCorrectPublisher(Message msg){
+
+	private static void sendSubscriptionToCorrectPublisher(Message msg) {
 		InternalMsg intMsg = new InternalMsg(msg);
 		// this position is AuctionID gerade= Publisher1; ungerade Publisher2
-		if ((Integer.parseInt(intMsg.getParams()[1]) % 2) == 0){
-			sqs.sendMessage(new SendMessageRequest(SubscriptionQueueList.get(0),msg.getBody()));
-		}
-		else{
-			sqs.sendMessage(new SendMessageRequest(SubscriptionQueueList.get(1),msg.getBody()));
+		if ((Integer.parseInt(intMsg.getParams()[1]) % 2) == 0) {
+			sqs.sendMessage(new SendMessageRequest(
+					SubscriptionQueueList.get(0), msg.getBody()));
+		} else {
+			sqs.sendMessage(new SendMessageRequest(
+					SubscriptionQueueList.get(1), msg.getBody()));
 		}
 		SimpleLogger.log("SubMessage balanced: " + intMsg.toString());
 	}
 
-	
-	private static void processBroadcast(){
+	private static void processBroadcast() {
 		ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(
 				globalBroadcastQueueUrl);
-		//SimpleLogger.log(sqsInformation.getReceiveBroadcastQueueUrl());
 		List<Message> messages = sqs.receiveMessage(receiveMessageRequest)
 				.getMessages();
 		for (Message message : messages) {
 			sendBroadcastToCorrectPublisher(message);
 			String messageRecieptHandle = message.getReceiptHandle();
-			sqs.deleteMessage(new DeleteMessageRequest(
-					globalBroadcastQueueUrl,messageRecieptHandle));
+			sqs.deleteMessage(new DeleteMessageRequest(globalBroadcastQueueUrl,
+					messageRecieptHandle));
 		}
 	}
-	
-	private static void sendBroadcastToCorrectPublisher(Message msg){
+
+	private static void sendBroadcastToCorrectPublisher(Message msg) {
 		InternalMsg intMsg = new InternalMsg(msg);
-		// this position is AuctionID gerade= Publisher1; ungerade Publisher2
-		SimpleLogger.log("tempLog" + intMsg.toString());
-		if ((Integer.parseInt(intMsg.getParams()[0]) % 2) == 0){
-			sqs.sendMessage(new SendMessageRequest(BroadcastQueueList.get(0),msg.getBody()));
-		}
-		else{
-			sqs.sendMessage(new SendMessageRequest(BroadcastQueueList.get(1),msg.getBody()));
+		if ((Integer.parseInt(intMsg.getParams()[0]) % 2) == 0) {
+			sqs.sendMessage(new SendMessageRequest(BroadcastQueueList.get(0),
+					msg.getBody()));
+		} else {
+			sqs.sendMessage(new SendMessageRequest(BroadcastQueueList.get(1),
+					msg.getBody()));
 		}
 		SimpleLogger.log("BroadMessage balanced: " + intMsg.toString());
 	}
@@ -130,27 +134,36 @@ public class PublisherBalancer {
 				.getQueueUrl();
 	}
 	
-	private static void test() throws InterruptedException {
-	
-		sqs.sendMessage(new SendMessageRequest(globalBroadcastQueueUrl,
-				"AUCTION_SCHEDULED/666/STARTZEITPUNKT/ENDZEITPUNKT/AUCTION_NAME"));
-		sqs.sendMessage(new SendMessageRequest(globalBroadcastQueueUrl,
-				"AUCTION_SCHEDULED/665/STARTZEITPUNKT/ENDZEITPUNKT/AUCTION_NAME"));
+	private static void live() throws InterruptedException {
+		processBroadcast();
+		processSubscription();
+		Thread.sleep(200);
+	}
 
+	private static void test() throws InterruptedException {
+		sqs.sendMessage(new SendMessageRequest(globalBroadcastQueueUrl,
+				"AUCTION_SCHEDULED/666/79879879/ENDZEITPUNKT/AUCTION_NAME"));
+		
+		processBroadcast();
 		Random rand = new Random();
+
 		while (true) {
 			sqs.sendMessage(new SendMessageRequest(globalSubscribtionQueueUrl,
-					"SUBSCRIBE/" + rand.nextInt() + "/666"));
-			sqs.sendMessage(new SendMessageRequest(globalBroadcastQueueUrl,
-					"NEW_HIGHEST_BIDDER/666/" + rand.nextDouble() + "/12"));
+					"SUBSCRIBE/" + "42" + "/666"));
 			sqs.sendMessage(new SendMessageRequest(globalSubscribtionQueueUrl,
-					"SUBSCRIBE/" + rand.nextInt() + "/665"));
+					"SUBSCRIBE/" + "43" + "/666"));
 			sqs.sendMessage(new SendMessageRequest(globalBroadcastQueueUrl,
-					"NEW_HIGHEST_BIDDER/665/" + rand.nextDouble() + "/12"));
-			
+					"NEW_HIGHEST_BIDDER/666/" + rand.nextDouble() + "/43"));
+			/*
+			 * sqs.sendMessage(new
+			 * SendMessageRequest(globalSubscribtionQueueUrl, "SUBSCRIBE/" +
+			 * rand.nextInt() + "/665")); sqs.sendMessage(new
+			 * SendMessageRequest(globalBroadcastQueueUrl,
+			 * "NEW_HIGHEST_BIDDER/665/" + rand.nextDouble() + "/12"));
+			 */
 			processBroadcast();
 			processSubscription();
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 		}
 	}
 }

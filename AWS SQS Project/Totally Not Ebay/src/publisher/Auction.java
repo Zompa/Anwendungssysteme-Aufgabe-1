@@ -7,13 +7,15 @@ public class Auction {
 	private int AuctionID;
 	private double highestBid; 
 	private int highestBidder;
+	private long auctionEnd;
 	private ArrayList<Subscriber> SubscriberList; 
 	
-	public Auction(int auctID){
+	public Auction(int auctID, long auctionEnd){
 		this.AuctionID = auctID;
 		this.highestBid = 0.0;
 		this.highestBidder = -1;
 		this.SubscriberList = new ArrayList<Subscriber>();
+		this.auctionEnd = auctionEnd;
 	}
 	
 	/**
@@ -21,7 +23,11 @@ public class Auction {
 	 * @return sqs Message “NEW_HIGHEST_BIDDER/(AUCTION_ID)/(BID)/(BIDDER)”
 	 */
 	public String getAuctionHighestBidderMsg(){
-		return "NEW_HIGHEST_BIDDER/" + this.AuctionID + "/"  + this.highestBid + "/" + this.highestBidder;
+		return "NEW_HIGHEST_BIDDER/" + this.AuctionID + "/"  + this.highestBid + "/" + this.highestBidder + "/" + this.auctionEnd;
+	}
+	
+	public String getAuctionEndMessage(){
+		return "AUCTION_END/" + this.AuctionID + "/"  + this.highestBidder + "/" + this.highestBid;
 	}
 	
 	/**
@@ -64,7 +70,9 @@ public class Auction {
 	}
 
 	public void addSubscriber(Subscriber sub){
+		if (this.getSubscriberByID(sub.getSubscriberID())== null){
 		this.SubscriberList.add(sub);
+		}
 	}
 	
 	public void removeSubscriber(Subscriber sub){

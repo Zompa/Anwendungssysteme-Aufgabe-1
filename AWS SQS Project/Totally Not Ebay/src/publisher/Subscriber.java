@@ -19,7 +19,7 @@ public class Subscriber {
 	public Subscriber(int ID, SQSInformation sqsInfo){
 		this.subscriberID = ID;
 		//TODO Was passiert wenn Queue schon vorhanden?
-		CreateQueueRequest createQueueRequest = new CreateQueueRequest("CLIENT_UPDATE_" + this.subscriberID);
+		CreateQueueRequest createQueueRequest = new CreateQueueRequest("Client_Update_Queue_" + this.subscriberID);
 		SubscriberQueueUrl = sqsInfo.getSqs().createQueue(createQueueRequest).getQueueUrl();		
 	}
 	

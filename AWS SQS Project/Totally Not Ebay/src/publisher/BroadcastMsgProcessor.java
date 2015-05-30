@@ -6,6 +6,7 @@ import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.sun.media.jfxmedia.logging.Logger;
 
 public class BroadcastMsgProcessor {
 	private AuctionManager auctionManager;
@@ -26,7 +27,15 @@ public class BroadcastMsgProcessor {
 
 		switch (msg.getCommand()) {
 		case "AUCTION_SCHEDULED":
-			auctionScheduled(auctionID);
+			long auctionEnd = 0;
+			try {
+				auctionEnd = Long.parseLong(msg.getParams()[1]);
+			}
+			catch (Exception ex){
+				ex.printStackTrace();
+			}
+			SimpleLogger.log("TempAuctionEnd: "+ auctionEnd  + " " + msg.getParams()[1] );
+			auctionScheduled(auctionID, auctionEnd);
 			break;
 		case "AUCTION_STARTED":
 			// No need for processing
@@ -46,9 +55,9 @@ public class BroadcastMsgProcessor {
 		}
 	}
 
-	private void auctionScheduled(int auctID) {
+	private void auctionScheduled(int auctID, long auctionEnd) {
 		if (auctionManager.hasAuctionWithID(auctID) == false){
-		auctionManager.addAuction(new Auction(auctID));
+		auctionManager.addAuction(new Auction(auctID, auctionEnd));
 		SimpleLogger.log("Created new auction. ID: " + auctID);		
 		}
 		else{
@@ -66,6 +75,7 @@ public class BroadcastMsgProcessor {
 					String msg = updateAuction.getAuctionHighestBidderMsg();
 					sqsInformation.getSqs().sendMessage(new SendMessageRequest(s
 							.getSubscriberQueueUrl(), msg));
+					//SimpleLogger.log(s.getSubscriberQueueUrl());
 					SimpleLogger.log("Sent Message: " + msg + " to ClientdID "
 							+ s.getSubscriberID());
 				}
@@ -80,7 +90,18 @@ public class BroadcastMsgProcessor {
 	}
 
 	private void auctionEnd(int auctID, int winnerID, double winningBid) {
-
+		Auction endAuction = auctionManager.getAuctionByID(auctID);
+		if (endAuction != null) {
+			for (Subscriber s : endAuction.getSubscriberList()) {
+				String msg = endAuction.getAuctionEndMessage();
+				sqsInformation.getSqs().sendMessage(new SendMessageRequest(s
+						.getSubscriberQueueUrl(), msg));
+				//SimpleLogger.log(s.getSubscriberQueueUrl());
+				SimpleLogger.log("Sent Message: " + msg + " to ClientdID "
+						+ s.getSubscriberID());
+			}
+			auctionManager.removeAuction(endAuction);
+		}
 	}
 
 	/**
