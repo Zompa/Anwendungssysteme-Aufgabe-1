@@ -16,6 +16,8 @@ public class Main {
 
 	/**
 	 * Starts an instance of every module
+	 * 
+	 * AWS initialization code taken from SQS eclipse example
 	 * @param args
 	 */
 	public static void main(String[] args) {

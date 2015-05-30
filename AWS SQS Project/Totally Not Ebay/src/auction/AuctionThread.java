@@ -11,6 +11,7 @@ import util.SimpleParser;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.DeleteQueueRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
@@ -24,7 +25,7 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
  */
 public class AuctionThread extends Thread {
 
-	private final static String QUEUE_NAME_PREFIX = "Auction_Queue_";
+	public final static String QUEUE_NAME_PREFIX = "Auction_Queue_";
 	private final static Logger LOGGER = Logger.getLogger(AuctionThread.class
 			.getName());
 	private static final int AUCTION_START_OFFSET = 5;
@@ -62,8 +63,9 @@ public class AuctionThread extends Thread {
 	 *            Name of the Auction
 	 * @param auctionTime
 	 *            Time of the Auction in seconds
+	 * @param auctionID ID of the Auction (please only use 666 right now
 	 */
-	public AuctionThread(AmazonSQS sqs, String name, int auctionTime) {
+	public AuctionThread(AmazonSQS sqs, String name, int auctionTime, int auctionID) {
 		super();
 		this.sqs = sqs;
 		this.name = name;
@@ -85,14 +87,15 @@ public class AuctionThread extends Thread {
 		registerAuctionAtRouter(false);
 	}
 
-	/**
-	 * Registers the auction on the routers to allow the transmitting of
-	 * messages
+
+	/**Registers the auction on the routers to allow the transmitting of
+	 * messages (bids). 
+	 * @param destruction if true sends a message to notify the routers about the end of the auction
 	 */
 	private void registerAuctionAtRouter(boolean destruction) {
 
-		List<String> routerQueueURLs = getRouterQueueURLs(sqs);
-
+		List<String> routerQueueURLs = sqs.listQueues("ROUTER_REGISTRY_QUEUE_").getQueueUrls();
+		if (routerQueueURLs.isEmpty()) throw new RuntimeException("No routers found.");
 		String message = destruction ? "AUCTION_DESTRUCTION/"
 				: "AUCTION_CREATION/";
 		message += auctionID + "/" + receiveQueueURLAbsolute;
@@ -103,46 +106,28 @@ public class AuctionThread extends Thread {
 		LOGGER.info("Registered Auction Creation/Destruction");
 	}
 
-	/**
-	 * This method is a placeholder. It would normally ask AWS for all existing
-	 * Queues and sorts out all queues that start with "ROUTER_REGISTRY_QUEUE_".
-	 * As we only have one router in this example, the method is not implemented
-	 * 
-	 * it only returns "ROUTER_REGISTRY_QUEUE_EXAMPLE"
-	 * 
-	 * @param sqs
-	 * @return
-	 */
-	private static List<String> getRouterQueueURLs(AmazonSQS sqs) {
-		List<String> result = new ArrayList<>();
-		result.add("ROUTER_REGISTRY_QUEUE_EXAMPLE");
-		return result;
-	}
+
 
 	@Override
 	public void run() {
-		// setting end time
+		// setting start & end time
 		Calendar calendar = Calendar.getInstance(); // auctionTime
-	//	SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 		startDate = new Date(calendar.getTime().getTime() + AUCTION_START_OFFSET*1000);
-	//	System.out.println(sdf.format(calendar.getTime()));
 		endDate = new Date(startDate.getTime() + auctionTime*1000);
-	//	System.out.println(sdf.format(startDate));
-	//	System.out.println(sdf.format(endDate));
 		broadcastAuctionScheduled();
+		//To ensure that all clients know about the auction we wait for a short amount of time
 		try {
 			Thread.sleep(AUCTION_START_OFFSET * 1000);
 		} catch (InterruptedException e1) {
 			interrupt();
 		}
 		broadcastAuctionStart();
-	//	System.out.println(sdf.format(Calendar.getInstance().getTime()));
 		// main loop: endTimeMillis is the end time of the auction
 		while (!isInterrupted() && Calendar.getInstance().getTime().before(endDate)) {
 			// check for new bids and process them
+			// I cant use long polling or the thread might not close the auction
 			processBids(sqs.receiveMessage(receiveRequest).getMessages());
 
-			// I cant use long polling or the thread might not close the auction
 			// in time
 			try {
 				Thread.sleep(100);
@@ -152,8 +137,16 @@ public class AuctionThread extends Thread {
 		}
 		registerAuctionAtRouter(true);
 		broadcastAuctionResults();
+		
+		destroyQueue();
 	}
 
+
+	private void destroyQueue() {
+
+        sqs.deleteQueue(new DeleteQueueRequest(receiveQueueURL));
+		
+	}
 
 	/**
 	 * checks if a bid is valid and sets a new highest Bidder if necessary.

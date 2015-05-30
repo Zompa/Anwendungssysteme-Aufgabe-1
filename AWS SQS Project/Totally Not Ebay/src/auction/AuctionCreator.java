@@ -23,8 +23,8 @@ public class AuctionCreator extends Thread {
 
 	public static final String AUCTION_CREATION_QUEUE_NAME = "Create_Auction_Queue";
 
-	private final static Logger LOGGER = Logger
-			.getLogger(AuctionCreator.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(AuctionCreator.class
+			.getName());
 	private final AmazonSQS sqs;
 
 	/**
@@ -74,12 +74,14 @@ public class AuctionCreator extends Thread {
 	private void createAuction(Message m) {
 
 		LOGGER.info("Create Auction");
-		//try catch to prevent whole Thread from shutting down because of one malicious message
+		// try catch to prevent whole Thread from shutting down because of one
+		// malicious message
 		try {
 			String[] attributes = SimpleParser.getMessageAttributes(m);
 			if (attributes[0].equals("CREATE_AUCTION")) {
-				new AuctionThread(sqs, attributes[1],
-						Integer.parseInt(attributes[2])).start();
+				if (!isAuctionRunning(attributes[3]))
+					new AuctionThread(sqs, attributes[1],
+							Integer.parseInt(attributes[2]),Integer.parseInt(attributes[3])).start();
 			} else {
 				LOGGER.info("WRONG MESSAGE: " + m.getBody());
 			}
@@ -87,11 +89,21 @@ public class AuctionCreator extends Thread {
 
 			LOGGER.info("WRONG MESSAGE: " + m.getBody());
 			e.printStackTrace();
-		}finally {
-			//delete message
-            String messageRecieptHandle = m.getReceiptHandle();
-            sqs.deleteMessage(new DeleteMessageRequest(AUCTION_CREATION_QUEUE_NAME, messageRecieptHandle));
+		} finally {
+			// delete message
+			String messageRecieptHandle = m.getReceiptHandle();
+			sqs.deleteMessage(new DeleteMessageRequest(
+					AUCTION_CREATION_QUEUE_NAME, messageRecieptHandle));
 		}
 
+	}
+
+	private boolean isAuctionRunning(String queueID) {
+		for (String queueUrl : sqs.listQueues(
+				AuctionThread.QUEUE_NAME_PREFIX + queueID).getQueueUrls()) {
+			if (queueUrl.equals(AuctionThread.QUEUE_NAME_PREFIX + queueID))
+				return true;
+		}
+		return false;
 	}
 }
