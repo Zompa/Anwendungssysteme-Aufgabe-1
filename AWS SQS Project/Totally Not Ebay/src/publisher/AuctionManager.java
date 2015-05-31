@@ -2,6 +2,11 @@ package publisher;
 
 import java.util.ArrayList;
 
+/**
+ * Built for use in the Publisher. Stores all Auctions
+ * @author Paul
+ *
+ */
 public class AuctionManager {
 	private ArrayList<Auction> activeAuctions; 
 

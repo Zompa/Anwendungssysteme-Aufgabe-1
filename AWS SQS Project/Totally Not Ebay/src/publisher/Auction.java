@@ -1,7 +1,11 @@
 package publisher;
 import java.util.ArrayList;
 
-
+/**
+ * Built as part of the Publisher. Stores Information about one Auction.
+ * @author Paul
+ *
+ */
 public class Auction {
 
 	private int AuctionID;

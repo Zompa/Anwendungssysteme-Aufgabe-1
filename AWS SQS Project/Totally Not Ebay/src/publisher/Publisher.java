@@ -1,6 +1,9 @@
 package publisher;
-
-// TODO Hat mit Skalierbarkeit ja mal gar nix zu tun 
+/**
+ * Publisher Thread. Needs to be started by the Balancer, which distributes the Messages
+ * @author Paul
+ *
+ */
 public class Publisher extends Thread{
 	private AuctionManager auctionManager;
 	private SQSInformation sqsInformation;
@@ -28,17 +31,4 @@ public class Publisher extends Thread{
 		}
 	}	
 
-
-	
-	
-	
-	/*
-	private static void test2(){
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/12/23"));
-		SQSInformation.sqs.sendMessage(new SendMessageRequest(SQSInformation.SubscribtionQueueUrl, "SUBSCRIBE/23/34"));
-		
-		SubscribtionMsgProcesser smb = new SubscribtionMsgProcesser();
-		smb.fetchSubscriptionMsgs();
-	}
-	*/
 }
