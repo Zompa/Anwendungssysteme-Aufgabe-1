@@ -1,7 +1,5 @@
 package client;
 
-import java.util.ArrayList;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -25,6 +23,7 @@ public class ClientMain {
 		AmazonSQS sqs = new AmazonSQSClient(credentials);
 		sqs.setRegion(Region.getRegion(Regions.EU_CENTRAL_1));
 		Client c = new Client(sqs);
+		@SuppressWarnings("unused")
 		ClientGUI test = new ClientGUI(c);
 	}
 }

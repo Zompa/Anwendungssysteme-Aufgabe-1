@@ -14,7 +14,7 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import util.SimpleParser;
 
 public class Client {
-	// Attribute
+	
 	private int id;
 	private ArrayList<Integer> auctionIDs = new ArrayList<Integer>();
 	public static final String CLIENT_QUEUE_NAME = "Client_Update_Queue_";
@@ -25,8 +25,11 @@ public class Client {
 	private double highestBid;
 	private int highestBidId;
 	private Date auctionEnd;
+	private boolean AuctionStillRuns;
 
-	// Constructor for the client with a fixed auction number
+	/**Constructor for the client with a fixed auction number
+	 * @param sqs
+	 */
 	public Client(AmazonSQS sqs) {
 		auctionIDs = new ArrayList<Integer>();
 		auctionIDs.add(666);// the id of the only auction in the system
@@ -40,7 +43,9 @@ public class Client {
 				.getQueueUrl();
 	}
 
-	// Generates message and destination for subscribe message and then sends it
+	/**Generates message and destination for subscribe message and then sends it
+	 * @param auctionId
+	 */
 	private void subscribe(int auctionId) {
 		String queueURLSubscribe = "SubscribeQueue";
 		String subscribeMessage = "SUBSCRIBE/" + id + "/" + choosenAuctionId;
@@ -53,8 +58,9 @@ public class Client {
 		}
 	}
 
-	// Generates message and destination for unsubscribe message and then sends
-	// it
+	/**Generates message and destination for unsubscribe message and then sends it
+	 * @param auctionId
+	 */
 	protected void unsubscribe(int auctionId) {
 		String queueURLUnsubscribe = "SubscribeQueue";
 		String unsubscribeMessage = "UNSUBSCRIBE/" + id + "/"
@@ -69,7 +75,9 @@ public class Client {
 
 	}
 
-	// Reads all messages from Publisher
+	/**
+	 * Reads all messages from Publisher
+	 */
 	public void receiveMessagesfromPublisher() {
 
 		String queueURLfromPublisher = "Client_Update_Queue_" + id;
@@ -81,22 +89,20 @@ public class Client {
 		for (Message receivedMessage : receivedfromPublisher) {
 			String[] message = SimpleParser
 					.getMessageAttributes(receivedMessage);
-			for (String s : message) {
-				System.out.println(s);
-			}
 			if (message[0].equals("NEW_HIGHEST_BIDDER")) {
 				if (Integer.parseInt(message[1]) == choosenAuctionId) {
 					highestBid = Double.parseDouble(message[2]);
 					highestBidId = Integer.parseInt(message[3]);
 					setAuctionEnd(Long.parseLong(message[4]));
+					setAuctionStillRuns(true);
 				}
 			} else if (message[0].equals("AUCTION_END")) {
 				if (Integer.parseInt(message[1]) == choosenAuctionId) {
 					highestBid = Double.parseDouble(message[3]);
 					highestBidId = Integer.parseInt(message[2]);
+					setAuctionStillRuns(false);
 				}
 			}
-
 			// delete message from queueURLfromPublisher
 			String receiptHandle = receivedMessage.getReceiptHandle();
 			sqs.deleteMessage(new DeleteMessageRequest(queueURLfromPublisher,
@@ -104,7 +110,9 @@ public class Client {
 		}
 	}
 
-	// Generates message and destination for make bid and then sends it
+	/**Generates message and destination for make bid and then sends it
+	 * @param bid
+	 */
 	public void sendBidToRouter(double bid) {
 		String queueURLfromClientToRouter = "Bid_Queue";
 		String bidMessage = "MAKE_BID/" + choosenAuctionId + "/" + bid + "/"
@@ -119,28 +127,47 @@ public class Client {
 	}
 
 	// From here on only getter and setter
+	/**
+	 * @return the client ID
+	 */
 	public int getClientId() {
 		return id;
 	}
 
+	/**
+	 * @return all available auctionIDs
+	 */
 	public ArrayList<Integer> getAuctionIDs() {
 		return auctionIDs;
 	}
 
+	/**
+	 * @return the choosen auction ID
+	 */
 	public int getChoosenAuctionId() {
 		return choosenAuctionId;
 	}
 
+	/**
+	 * @return the highest bid 
+	 */
 	public double getHighestBid() {
 		return highestBid;
 	}
 
+	/**
+	 * @return the ID of the highest bidder
+	 */
 	public int getHighestBidId() {
 		return highestBidId;
 	}
-
-	// sets the choosenAuctionID and automatically subscribes to the new action
-	// and unsubscribes to old auction
+ 
+	/**
+	 * sets the choosenAuctionID and automatically subscribes to the new action
+	 * and unsubscribes to old auction
+	 * 
+	 * @param choosenAuctionId
+	 */
 	public void setChoosenAuctionId(int choosenAuctionId) {
 		if (this.choosenAuctionId != 0) {
 			unsubscribe(this.choosenAuctionId);
@@ -149,24 +176,46 @@ public class Client {
 		subscribe(choosenAuctionId);
 	}
 
-	public int getID() {
-		return id;
-	}
-
+	/**
+	 * @param id
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @param auctionIDs
+	 */
 	public void setAuctionIDs(ArrayList<Integer> auctionIDs) {
 		this.auctionIDs = auctionIDs;
 	}
 
+	/**
+	 * @return the auction End as a Date
+	 */
 	public Date getAuctionEnd() {
 		return auctionEnd;
 	}
 
+	/**
+	 * @param date
+	 */
 	public void setAuctionEnd(long date) {
 		auctionEnd = new Date(date);
+	}
+
+	/**
+	 * @return if the auction still runs
+	 */
+	public boolean isAuctionStillRuns() {
+		return AuctionStillRuns;
+	}
+
+	/**
+	 * @param auctionStillRuns
+	 */
+	public void setAuctionStillRuns(boolean auctionStillRuns) {
+		AuctionStillRuns = auctionStillRuns;
 	}
 
 }
