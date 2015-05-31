@@ -37,7 +37,7 @@ public class PublisherBalancer {
 		}
 
 		try {
-			test();
+			//test();
 			live();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -135,9 +135,11 @@ public class PublisherBalancer {
 	}
 	
 	private static void live() throws InterruptedException {
+		while (true) {
 		processBroadcast();
 		processSubscription();
 		Thread.sleep(200);
+		}
 	}
 
 	private static void test() throws InterruptedException {

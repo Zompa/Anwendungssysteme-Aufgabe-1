@@ -75,7 +75,6 @@ public class BroadcastMsgProcessor {
 					String msg = updateAuction.getAuctionHighestBidderMsg();
 					sqsInformation.getSqs().sendMessage(new SendMessageRequest(s
 							.getSubscriberQueueUrl(), msg));
-					//SimpleLogger.log(s.getSubscriberQueueUrl());
 					SimpleLogger.log("Sent Message: " + msg + " to ClientdID "
 							+ s.getSubscriberID());
 				}

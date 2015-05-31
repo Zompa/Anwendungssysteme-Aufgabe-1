@@ -54,7 +54,7 @@ public class AuctionCreator extends Thread {
 		LOGGER.info("Start Polling Loop");
 		// Thread loop
 		while (!isInterrupted()) {
-			LOGGER.info("Long polling");
+			 LOGGER.info("Long polling");
 			// poll messages
 			List<Message> messages = sqs.receiveMessage(receiveRequest)
 					.getMessages();
